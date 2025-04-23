@@ -1,5 +1,3 @@
-// Colors
-
 const neutral = {
 	90: "#FFFFFF1A",
 	100: "#FFFFFF",
@@ -32,38 +30,40 @@ const background = {
 const divider = "#E6E8F0";
 
 const primary = {
-	main: "#039D55",
-	deep: "#026034",
-	light: "#EBFDF2",
-	dark: "#1c6641",
-	semiLight: "#E4FFF3",
+	main: "#8B4513", // Rich brown
+	deep: "#5C2F0A", // Deep brown
+	light: "#F5E9D8", // Beige
+	dark: "#6B3A0F", // Darker brown
+	semiLight: "#FFF5E6", // Light beige
 	contrastText: "#FFFFFF",
-	customType1: "#0DCB72",
-	customType2: "#3BB77E",
-	customType3: "#29CE00",
+	customType1: "#A0522D", // Sienna brown
+	customType2: "#CD853F", // Peru brown
+	customType3: "#DEB887", // Burlywood beige
 	overLay: "#000000",
-	lite: "rgba(3, 157, 85, 0.1)",
-	icon: "#039D55",
+	lite: "rgba(139, 69, 19, 0.1)", // Brown with opacity
+	icon: "#8B4513", // Rich brown
 };
+
 const moduleTheme = {
-	pharmacy: "#039D55",
-	ecommerce: "#039D55",
-	food: "#039D55",
-	parcel: "#039D55",
+	pharmacy: "#8B4513", // Brown
+	ecommerce: "#8B4513", // Brown
+	food: "#8B4513", // Brown
+	parcel: "#8B4513", // Brown
 };
-const horizontalCardBG = "#E4FFF3";
+
+const horizontalCardBG = "#FFF5E6"; // Light beige
 
 const secondary = {
-	main: "#10B981",
-	light: "#3FC79A",
-	dark: "#0B815A",
+	main: "#F28C38", // Orange
+	light: "#FFB266", // Light orange
+	dark: "#D76A1F", // Dark orange
 	contrastText: "#FFFFFF",
 };
 
 const success = {
-	main: "#14B8A6",
-	light: "#43C6B7",
-	dark: "#0E8074",
+	main: "#DAA520", // Goldenrod
+	light: "#FFE4B5", // Light beige/gold
+	dark: "#B8860B", // Dark goldenrod
 	contrastText: "#FFFFFF",
 };
 
@@ -97,36 +97,40 @@ const error = {
 };
 
 const text = {
-	primary: "#3E594D",
-	secondary: "#93A2AE",
+	primary: "#4A3728", // Dark brown
+	secondary: "#9CA3AF", // Kept neutral gray
 	disabled: "rgba(55, 65, 81, 0.48)",
 	custom: "#3F3F3F",
 	customText1: "#4B5563",
 };
 
 const footer = {
-	inputButton: "#BBFFDF",
-	inputButtonHover: "#6dcfa6",
-	bottom: "rgba(0, 98, 52, 0.3)",
+	inputButton: "#FFDAB9", // Peachy beige
+	inputButtonHover: "#DEB887", // Burlywood beige
+	bottom: "rgba(139, 69, 19, 0.3)", // Brown with opacity
 	foodBottom: "#686B78",
 	appDownloadButtonBg: "#1A1A1A",
-	appDownloadButtonBgGray: "#3E594D",
+	appDownloadButtonBgGray: "#4A3728", // Dark brown
 	appDownloadButtonBgHover: "#4f4f4f",
 	foodFooterBg: "#414141",
 };
+
 const customColor = {
 	textGray: "#9c9c9c",
 	textGrayDeep: "#787676",
 	buyButton: "#F9E091",
 	parcelWallet: "#8B3FFD",
 };
+
 const whiteContainer = {
 	main: "#ffffff",
 };
+
 const pink = {
 	main: "#FF6D76",
 };
-const foodCardColor = "#FFF6EF";
+
+const foodCardColor = "#FFF8F0"; // Warm beige
 const paperBoxShadow = "#E5EAF1";
 const roundStackOne = "rgba(255, 255, 255, 0.04)";
 const roundStackTwo = "rgba(255, 255, 255, 0.06)";
