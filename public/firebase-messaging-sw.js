@@ -6,13 +6,13 @@ importScripts(
 );
 // // Initialize the Firebase app in the service worker by passing the generated config
 const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
-  measurementId: "",
+  apiKey: "AIzaSyDEjGFJ53GR6_HWgojuHiaW2YJHG96MCtY",
+  authDomain: "nobo-5255d.firebaseapp.com",
+  projectId: "nobo-5255d",
+  storageBucket: "nobo-5255d.firebasestorage.app",
+  messagingSenderId: "57986059959",
+  appId: "1:57986059959:web:7cb1551959c05e0f714732",
+  measurementId: "G-17R4YFQQ76"
 };
 
 firebase?.initializeApp(firebaseConfig);
