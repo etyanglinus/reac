@@ -1,9 +1,6 @@
-// Colors
-
 const neutral = {
   100: "#000000",
   200: "#303032",
-  // 300: "#323232",
   300: "#111827",
   400: "#9CA3AF",
   500: "#c5c5ca",
@@ -14,11 +11,12 @@ const neutral = {
   1000: "#FFFFFF",
   1100: "#D6D6D6",
 };
+
 const moduleTheme = {
-  pharmacy: "#31C0F5",
-  ecommerce: "#EEF5FF",
-  food: "#EF7822",
-  parcel: "#D7EFE4",
+  pharmacy: "#A0522D", // Sienna brown
+  ecommerce: "#FFF5E6", // Light beige
+  food: "#F28C38", // Orange
+  parcel: "#DEB887", // Burlywood beige
 };
 
 const background = {
@@ -34,37 +32,39 @@ const background = {
   custom6: "rgba(255, 255, 255, 0.05)",
   custom7: "#000000",
 };
-const horizontalCardBG = neutral[900];
+
+const horizontalCardBG = "#2C1F0A"; // Dark brown
 const divider = "#2D3748";
-const foodCardColor = neutral[800];
+const foodCardColor = "#3A2A0F"; // Darker brown
 const roundStackOne = "rgba(255, 255, 255, 0.04)";
 const roundStackTwo = "rgba(255, 255, 255, 0.06)";
+
 const primary = {
-  main: "#039D55",
-  light: "#909BEF",
-  dark: "#1c6641",
-  deep: "#026034",
-  contrastText: neutral[900],
-  semiLight: "#E4FFF3",
+  main: "#8B4513", // Rich brown
+  light: "#F5E9D8", // Beige
+  dark: "#6B3A0F", // Darker brown
+  deep: "#5C2F0A", // Deep brown
+  contrastText: neutral[1000], // White for contrast
+  semiLight: "#FFF5E6", // Light beige
   overLay: "#000000",
-  customType2: "#3BB77E",
-  lite: "rgba(3, 157, 85, 0.1)",
-  customType3: "#29CE00",
+  customType2: "#CD853F", // Peru brown
+  lite: "rgba(139, 69, 19, 0.1)", // Brown with opacity
+  customType3: "#DEB887", // Burlywood beige
   icon: "#ffffff",
 };
 
 const secondary = {
-  main: "#10B981",
-  light: "#3FC79A",
-  dark: "#0B815A",
-  contrastText: neutral[900],
+  main: "#F28C38", // Orange
+  light: "#FFB266", // Light orange
+  dark: "#D76A1F", // Dark orange
+  contrastText: neutral[1000], // White for contrast
 };
 
 const success = {
-  main: "#14B8A6",
-  light: "#43C6B7",
-  dark: "#0E8074",
-  contrastText: neutral[900],
+  main: "#DAA520", // Goldenrod
+  light: "#FFE4B5", // Light beige/gold
+  dark: "#B8860B", // Dark goldenrod
+  contrastText: neutral[1000], // White for contrast
 };
 
 const info = {
@@ -72,7 +72,7 @@ const info = {
   light: "#64B6F7",
   dark: "#0B79D0",
   lite: "#DBF5FF",
-  contrastText: neutral[900],
+  contrastText: neutral[1000], // White for contrast
   contrastText1: "#F5F6F8",
   blue: "#0D6EFD",
   custom1: "#31C0F5",
@@ -84,7 +84,7 @@ const warning = {
   dark: "#B27B16",
   lite: "#FFBD8B",
   liter: "#FFF8F2",
-  contrastText: neutral[900],
+  contrastText: neutral[1000], // White for contrast
   new: "#FFC817",
 };
 
@@ -92,7 +92,7 @@ const error = {
   main: "#D14343",
   light: "#DA6868",
   dark: "#922E2E",
-  contrastText: neutral[900],
+  contrastText: neutral[1000], // White for contrast
   deepLight: "#FF725E",
 };
 
@@ -103,29 +103,35 @@ const text = {
   custom: "#ede8e8",
   customText1: "#EDF2F7",
 };
+
 const footer = {
-  inputButton: "#BBFFDF",
-  inputButtonHover: "#67907e",
-  bottom: "rgba(0, 98, 52, 0.3)",
+  inputButton: "#FFDAB9", // Peachy beige
+  inputButtonHover: "#DEB887", // Burlywood beige
+  bottom: "rgba(139, 69, 19, 0.3)", // Brown with opacity
   foodBottom: "#686B78",
   appDownloadButtonBg: "#1A1A1A",
-  appDownloadButtonBgGray: "#3E594D",
+  appDownloadButtonBgGray: "#4A3728", // Dark brown
   foodFooterBg: "#414141",
 };
+
 const customColor = {
   textGray: "#9c9c9c",
   textGrayDeep: "#787676",
   buyButton: "#F9E091",
   parcelWallet: "#8B3FFD",
 };
+
 const whiteContainer = {
   main: "#ffffff",
 };
+
 const pink = {
   main: "#FF6D76",
 };
+
 const toolTipColor = "#88908C";
 const paperBoxShadow = "#E5EAF1";
+
 export const darkThemeOptions = {
   components: {
     MuiAvatar: {
@@ -264,7 +270,7 @@ export const darkThemeOptions = {
     "0px 1px 6px rgba(0, 0, 0, 0.24)",
     "0px 2px 6px rgba(0, 0, 0, 0.24)",
     "0px 3px 6px rgba(0, 0, 0, 0.24)",
-    "0px 4px 6px rgba(0, 0, 0, 0.24)",
+    "0px 4px 6px rgba weeds(0, 0, 0, 0.24)",
     "0px 5px 12px rgba(0, 0, 0, 0.24)",
     "0px 5px 14px rgba(0, 0, 0, 0.24)",
     "0px 5px 15px rgba(0, 0, 0, 0.24)",
