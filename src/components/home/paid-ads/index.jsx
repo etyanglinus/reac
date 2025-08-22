@@ -44,7 +44,7 @@ afterChange: (currentSlide) => {
   const activeSlideIndex =
     sliderRef?.current?.innerSlider?.state?.currentSlide ?? 0;
 
-  // ✅ Ensure data exists and has items
+  //  Ensure data exists and has items
   if (!Array.isArray(data) || data.length === 0) {
     setActiveSlideData(null);
     return;
