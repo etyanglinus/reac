@@ -38,17 +38,26 @@ const PaidAds = () => {
     prevArrow: <PrevFood />,
     nextArrow: <NextFood />,
     beforeChange: (oldIndex, newIndex) => setCurrentSlide(newIndex),
-    afterChange: (currentSlide) => {
-      setCurrentSlide(currentSlide);
-      const activeSlideIndex =
-        sliderRef?.current?.innerSlider?.state?.currentSlide;
-      const activeSlide = data[activeSlideIndex || 0];
-      setActiveSlideData(activeSlide);
-      if (activeSlide?.add_type === "video_promotion") {
-        sliderRef?.current?.slickPause?.();
-      } else {
-      }
-    },
+afterChange: (currentSlide) => {
+  setCurrentSlide(currentSlide);
+
+  const activeSlideIndex =
+    sliderRef?.current?.innerSlider?.state?.currentSlide ?? 0;
+
+  // ✅ Ensure data exists and has items
+  if (!Array.isArray(data) || data.length === 0) {
+    setActiveSlideData(null);
+    return;
+  }
+
+  const activeSlide = data[activeSlideIndex] ?? data[0];
+  setActiveSlideData(activeSlide);
+
+  if (activeSlide?.add_type === "video_promotion") {
+    sliderRef?.current?.slickPause?.();
+  }
+},
+
     responsive: [
       {
         breakpoint: 2000,
