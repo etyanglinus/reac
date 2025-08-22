@@ -68,6 +68,7 @@ const OrderCalculation = (props) => {
   const tempExtraCharge = extraCharge ?? 0;
   const theme = useTheme();
   let couponType = "coupon";
+
   const handleDeliveryFee = () => {
     let price = getDeliveryFees(
       storeData,
@@ -122,12 +123,14 @@ const OrderCalculation = (props) => {
       getProductDiscount(cartList, storeData) -
       getCouponDiscount(couponDiscount, storeData, cartList)
     : handlePurchasedAmount(cartList) - getProductDiscount(cartList, storeData);
+
   const dispatch = useDispatch();
   const referDiscount = getReferDiscount(
     totalAmountForRefer,
     customerData?.data?.discount_amount,
     customerData?.data?.discount_amount_type
   );
+
   const handleOrderAmount = () => {
     let totalAmount = getCalculatedTotal(
       cartList,
@@ -151,6 +154,7 @@ const OrderCalculation = (props) => {
     dispatch(setTotalAmount(totalAmount));
     return totalAmount;
   };
+
   const discountedPrice = getProductDiscount(cartList, storeData);
   const totalAmountAfterPartial = handleOrderAmount() - walletBalance;
 
@@ -172,9 +176,11 @@ const OrderCalculation = (props) => {
       ? ` ${badText} ${getAmountWithSign(bad_weather_fees)}`
       : ""
   }`;
+
   return (
     <>
       <CalculationGrid container item xs={12} spacing={1} mt="1rem">
+        {/*  Extra Packaging Option */}
         {storeData?.extra_packaging_status ? (
           <>
             <Grid item xs={8}>
@@ -205,6 +211,7 @@ const OrderCalculation = (props) => {
           </>
         ) : null}
 
+        {/*  Items Price */}
         <Grid item md={8} xs={8}>
           {cartList.length > 1 ? t("Items Price") : t("Item Price")}
         </Grid>
@@ -213,6 +220,8 @@ const OrderCalculation = (props) => {
             {getAmountWithSign(getSubTotalPrice(cartList))}
           </Typography>
         </Grid>
+
+        {/*  Discounts */}
         <Grid item md={8} xs={8}>
           {t("Discount")}
         </Grid>
@@ -230,6 +239,8 @@ const OrderCalculation = (props) => {
             </Typography>
           </Stack>
         </Grid>
+
+        {/*  Coupon Discount */}
         {couponDiscount ? (
           <>
             <Grid item md={8} xs={8}>
@@ -256,6 +267,8 @@ const OrderCalculation = (props) => {
             </Grid>
           </>
         ) : null}
+
+        {/*  Referral Discount */}
         {customerData?.data?.is_valid_for_discount ? (
           <>
             <Grid item md={8} xs={8}>
@@ -275,6 +288,8 @@ const OrderCalculation = (props) => {
             </Grid>
           </>
         ) : null}
+
+        {/*  Tax */}
         {storeData ? (
           storeData?.tax ? (
             <>
@@ -308,6 +323,8 @@ const OrderCalculation = (props) => {
             </>
           ) : null
         ) : null}
+
+        {/*  Deliveryman Tips */}
         {orderType === "delivery" || orderType === "schedule_order" ? (
           Number.parseInt(configData?.dm_tips_status) === 1 ? (
             <>
@@ -329,26 +346,32 @@ const OrderCalculation = (props) => {
           ) : null
         ) : null}
 
-        {configData?.additional_charge_status === 1 ? (
-          <>
-            <Grid item xs={8} sx={{ textTransform: "capitalize" }}>
-              {t(configData?.additional_charge_name)}
-            </Grid>
-            <Grid item xs={4} align="right">
-              <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="flex-end"
-                spacing={0.5}
-              >
-                <Typography>{"(+)"}</Typography>
-                <Typography>
-                  {getAmountWithSign(configData?.additional_charge)}
-                </Typography>
-              </Stack>
-            </Grid>
-          </>
-        ) : null}
+{/*  Additional Charge as Percentage */}
+{configData?.additional_charge_status === 1 && configData?.additional_charge > 0 ? (
+  <>
+    <Grid item xs={8} sx={{ textTransform: "capitalize" }}>
+      {configData?.additional_charge_name 
+        ? `${t(configData?.additional_charge_name)} (${configData?.additional_charge}%)`
+        : t("Additional Charge")}
+    </Grid>
+    <Grid item xs={4} align="right">
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="flex-end"
+        spacing={0.5}
+      >
+        <Typography>{"(+)"}</Typography>
+        <Typography>
+          {getAmountWithSign((getSubTotalPrice(cartList) * configData?.additional_charge) / 100)}
+        </Typography>
+      </Stack>
+    </Grid>
+  </>
+) : null}
+
+
+        {/*  Extra Packaging */}
         {isPackaging ? (
           <>
             <Grid item xs={8} sx={{ textTransform: "capitalize" }}>
@@ -367,58 +390,59 @@ const OrderCalculation = (props) => {
             </Grid>
           </>
         ) : null}
-        {
-          <>
-            {isLoading ? (
-              <CustomStackFullWidth
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                sx={{ paddingInlineStart: "5px" }}
-              >
-                <Skeleton variant="text" width="50px" />
-                <Skeleton variant="text" width="50px" />
-              </CustomStackFullWidth>
-            ) : (
-              <>
-                {orderType === "delivery" || orderType === "schedule_order" ? (
-                  <>
-                    <Grid item xs={8} sx={{ textTransform: "capitalize" }}>
-                      <Typography component="span" align="center">
-                        {t("Delivery fee")}
-                        {Number.parseInt(storeData?.self_delivery_system) !==
-                          1 && (
-                          <Typography component="span">
-                            <Tooltip
-                              title={deliveryToolTipsText}
-                              placement="top"
-                              arrow={true}
-                            >
-                              <InfoIcon sx={{ fontSize: "11px" }} />
-                            </Tooltip>
-                          </Typography>
-                        )}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={4} align="right">
-                      {couponDiscount ? (
-                        couponDiscount?.coupon_type === "free_delivery" ? (
-                          <Typography>{t("Free")}</Typography>
-                        ) : (
-                          storeData && handleDeliveryFee()
-                        )
+
+        {/*  Delivery Fee */}
+        <>
+          {isLoading ? (
+            <CustomStackFullWidth
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ paddingInlineStart: "5px" }}
+            >
+              <Skeleton variant="text" width="50px" />
+              <Skeleton variant="text" width="50px" />
+            </CustomStackFullWidth>
+          ) : (
+            <>
+              {orderType === "delivery" || orderType === "schedule_order" ? (
+                <>
+                  <Grid item xs={8} sx={{ textTransform: "capitalize" }}>
+                    <Typography component="span" align="center">
+                      {t("Delivery fee")}
+                      {Number.parseInt(storeData?.self_delivery_system) !== 1 && (
+                        <Typography component="span">
+                          <Tooltip
+                            title={deliveryToolTipsText}
+                            placement="top"
+                            arrow={true}
+                          >
+                            <InfoIcon sx={{ fontSize: "11px" }} />
+                          </Tooltip>
+                        </Typography>
+                      )}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} align="right">
+                    {couponDiscount ? (
+                      couponDiscount?.coupon_type === "free_delivery" ? (
+                        <Typography>{t("Free")}</Typography>
                       ) : (
                         storeData && handleDeliveryFee()
-                      )}
-                    </Grid>
-                  </>
-                ) : null}
-              </>
-            )}
-          </>
-        }
+                      )
+                    ) : (
+                      storeData && handleDeliveryFee()
+                    )}
+                  </Grid>
+                </>
+              ) : null}
+            </>
+          )}
+        </>
 
         <CustomDivider border="1px" />
+
+        {/*  Final Total */}
         <TotalGrid container md={12} xs={12} mt="1rem">
           {isLoading ? (
             <CustomStackFullWidth
@@ -463,6 +487,8 @@ const OrderCalculation = (props) => {
             </>
           )}
         </TotalGrid>
+
+        {/*  Wallet Payment */}
         {usePartialPayment && payableAmount > walletBalance ? (
           <>
             <Grid item md={8} xs={8} sx={{ textTransform: "capitalize" }}>
@@ -481,6 +507,8 @@ const OrderCalculation = (props) => {
             </Grid>
           </>
         ) : null}
+
+        {/*  Due Payment */}
         {usePartialPayment && payableAmount > walletBalance ? (
           <>
             <Grid item md={8} xs={8}>
@@ -500,6 +528,8 @@ const OrderCalculation = (props) => {
             </Grid>
           </>
         ) : null}
+
+        {/*  Cashback Info */}
         {token && cashbackAmount?.cashback_amount > 0 && (
           <Grid item xs={12}>
             <Box
@@ -524,8 +554,7 @@ const OrderCalculation = (props) => {
                         getAmountWithSign(cashbackAmount?.max_discount) +
                         "."
                       : ""
-                  }
-`
+                  }`
                 : ""}
             </Box>
           </Grid>
