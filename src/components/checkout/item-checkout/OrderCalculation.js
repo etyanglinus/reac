@@ -351,7 +351,7 @@ const OrderCalculation = (props) => {
   <>
     <Grid item xs={8} sx={{ textTransform: "capitalize" }}>
       {configData?.additional_charge_name 
-        ? `${t(configData?.additional_charge_name)} (${configData?.additional_charge}%)`
+        ? `${t(configData?.additional_charge_name)} `
         : t("Additional Charge")}
     </Grid>
     <Grid item xs={4} align="right">
