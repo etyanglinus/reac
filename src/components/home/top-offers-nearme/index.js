@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { alpha, Button, Skeleton, Stack } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Slider from "react-slick";
 import { getLanguage } from "helper-functions/getLanguage";
@@ -12,7 +12,7 @@ import {
 import { RTL } from "../../rtl";
 import SpecialOfferCardShimmer from "../../Shimmer/SpecialOfferCardSimmer";
 import H2 from "../../typographies/H2";
-import { NextFood, PrevFood } from "../best-reviewed-items/SliderSettings";
+import { createEnhancedArrows } from "../../common/EnhancedSliderArrows";
 import { HomeComponentsWrapper } from "../HomePageComponents";
 import CustomContainer from "components/container";
 import useGetTopOffers from "api-manage/hooks/react-query/product-details/useGetTopOffers";
@@ -21,16 +21,20 @@ import fire_image from "../../../assets/fire.svg";
 import StoreCard from "components/cards/StoreCard";
 import Link from "next/link";
 
-const TopOffersNearMe = ({ title }) => {
+const TopOffersNearMe = ({ title}) => {
   const { t } = useTranslation();
+  const type=""
+  const sortBy=""
+  const searchKey=""
 
-  const { data, refetch, isLoading, isFetching } = useGetTopOffers();
+
+  const { data, refetch, isLoading, isFetching } = useGetTopOffers(sortBy,searchKey,type);
 
   const [isHover, setIsHover] = useState(false);
   const lanDirection = getLanguage() ? getLanguage() : "ltr";
-  useEffect(() => {
-    refetch();
-  }, []);
+  // useEffect(() => {
+  //   refetch();
+  // }, []);
   const settings = {
     dots: false,
     infinite: data?.stores?.length > 3 ? true : false,
@@ -41,8 +45,11 @@ const TopOffersNearMe = ({ title }) => {
     speed: 800,
     autoplaySpeed: 4000,
     variableHeight: true,
-    prevArrow: isHover && <PrevFood displayNoneOnMobile />,
-    nextArrow: isHover && <NextFood displayNoneOnMobile />,
+    ...createEnhancedArrows(isHover, { 
+      displayNoneOnMobile: true,
+      variant: "primary",
+      noBackground: true
+    }),
     responsive: [
       {
         breakpoint: 2000,
@@ -159,7 +166,7 @@ const TopOffersNearMe = ({ title }) => {
                     <H2 text={title ? title : t("Special Offer")} />
                   </Stack>
                 )}
-                {isFetching ? (
+                {isFetching  ? (
                   <Skeleton width="100px" variant="80px" />
                 ) : (
                   <Link
@@ -193,7 +200,7 @@ const TopOffersNearMe = ({ title }) => {
                 }}
               >
                 <>
-                  {isFetching ? (
+                  {isFetching  ? (
                     <Slider {...settings}>
                       {[...Array(5)].map((item, index) => {
                         return <SpecialOfferCardShimmer key={index} />;

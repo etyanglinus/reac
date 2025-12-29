@@ -88,7 +88,7 @@ const NoItemsSvg = () => {
             width="134.922"
             height="23.5393"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
             <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feBlend

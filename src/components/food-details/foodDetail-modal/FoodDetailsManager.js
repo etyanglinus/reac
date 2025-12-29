@@ -35,7 +35,6 @@ const FoodDetailsManager = (props) => {
 
     handleRouteToStore,
   } = props;
-
   return (
     <Grid container direction="row">
       <Grid item xs={12} md={12} position="relative">
@@ -81,15 +80,7 @@ const FoodDetailsManager = (props) => {
               >
                 {product?.store_name}
               </Typography>
-            ) : (
-              <Typography
-                fontSize="14px"
-                fontWeight="400"
-                color={theme.palette.whiteContainer.main}
-              >
-                {product?.store_name}
-              </Typography>
-            )}
+            ) : null}
           </Stack>
           {!product?.available_date_ends && (
             <>

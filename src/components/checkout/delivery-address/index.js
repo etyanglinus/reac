@@ -206,6 +206,7 @@ const DeliveryAddress = ({
           saveAddress={saveAddress}
           address={address}
           setAddress={setAddress}
+          orderType={orderType}
         />
       )}
 

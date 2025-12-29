@@ -7,15 +7,15 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
 import { Badge, BottomNavigation, Paper } from "@mui/material";
-import { CustomStackFullWidth } from "../../styled-components/CustomStyles.style";
+import { CustomStackFullWidth } from "styled-components/CustomStyles.style";
 import { CustomBottomNavigationAction } from "./NavBar.style";
 import { t } from "i18next";
 import CardView from "../added-cart-view";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
-import { getCartListModuleWise } from "../../helper-functions/getCartListModuleWise";
+import { getCartListModuleWise } from "helper-functions/getCartListModuleWise";
 import WishListCardView from "../wishlist";
-import { getToken } from "../../helper-functions/getToken";
+import { getToken } from "helper-functions/getToken";
 import { toast } from "react-hot-toast";
 import { Taxi } from "components/header/second-navbar/SecondNavbar";
 import Box from "@mui/material/Box";
@@ -27,7 +27,6 @@ const styles = {
   width: "100%",
   height: "100%",
   padding: "0px 1rem",
-  //paddingRight: "10px",
 };
 
 const BottomNav = () => {
@@ -37,6 +36,7 @@ const BottomNav = () => {
   const totalWishList = wishLists?.item?.length + wishLists?.store?.length;
   const rentalTotalWishList =
     wishLists?.providers?.length + wishLists?.vehicles?.length;
+
   const [sideDrawerOpen, setSideDrawerOpen] = useState(false);
   const [wishListSideDrawerOpen, setWishListSideDrawerOpen] = useState(false);
   const router = useRouter();
@@ -51,7 +51,6 @@ const BottomNav = () => {
       toast.error(t("Please login"));
     }
   };
-
 
   // const handleChange = () => {};
   return (

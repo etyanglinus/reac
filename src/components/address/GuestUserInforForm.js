@@ -36,13 +36,12 @@ const GuestUserInforForm = ({
       try {
         dispatch(setGuestUserInfo(values));
         handleClose();
-      } catch (err) {}
+      } catch (err) { }
     },
   });
 
   const lanDirection = getLanguage() ? getLanguage() : "ltr";
   const nameHandler = (value) => {
-
     addAddressFormik.setFieldValue("contact_person_name", value);
     if (rental) {
       dispatch(
@@ -65,7 +64,6 @@ const GuestUserInforForm = ({
     }
   };
   const emailHandler = (value) => {
-
 
     addAddressFormik.setFieldValue("contact_person_email", value);
     if (rental) {
@@ -138,10 +136,10 @@ const GuestUserInforForm = ({
               borderRadius="10px"
             />
           </Grid>
-      
+
           <Grid item xs={12} md={12} sx={{ marginTop: "8px" }}>
             <CustomTextFieldWithFormik
-              required="true"
+              required
               type="text"
               label={t("Contact Person Email")}
               touched={addAddressFormik.touched.contact_person_email}

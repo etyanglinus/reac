@@ -15,7 +15,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick-theme.css";
 import "slick-carousel/slick/slick.css";
 import { Box, Stack } from "@mui/system";
-import React, { useReducer } from "react";
+import React, {useReducer, useState} from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,7 +27,8 @@ import { ModuleTypes } from "helper-functions/moduleTypes";
 import {
   addWishListStore,
   removeWishListStore,
-} from "../../redux/slices/wishList";
+} from "redux/slices/wishList";
+import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined'
 import {
   CustomBoxFullWidth,
   CustomStackFullWidth,
@@ -42,6 +43,7 @@ import H1 from "../typographies/H1";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { getImageUrl } from "utils/CustomFunctions";
+import StoreShare from "components/store-details/StoreShare";
 
 const ContentWrapper = styled(CustomBoxFullWidth)(({ theme }) => ({
   position: "relative",
@@ -110,9 +112,9 @@ const Top = (props) => {
     isLoading,
     setOpenReviewModal,
   } = props;
-
   const [state, dispatch] = useReducer(reducer, initialState);
   const theme = useTheme();
+  const [openShareModel,setOpenShareModel]=useState(false)
   const dispatchRedux = useDispatch();
   const isSmall = useMediaQuery(theme.breakpoints.down("md"));
   const { t } = useTranslation();
@@ -230,6 +232,13 @@ const Top = (props) => {
       router.push(link);
     }
   };
+  const handleCopy = (url) => {
+    navigator.clipboard.writeText(url)
+    toast(() => <span>{t('Your restaurant URL has been copied')}</span>)
+  }
+  const text1=t("discount will be applicable when  order amount exceeds is more than")
+  const max=t("max")
+  const text2=t("discount is applicable.")
 
   const content = () => {
     if (isSmall) {
@@ -239,8 +248,33 @@ const Top = (props) => {
             sx={{
               position: "relative",
               height: "122px",
+              borderBottomRightRadius:"10px"
             }}
           >
+            {storeDetails?.discount ? (
+              <Stack
+                sx={{
+                  position: "absolute",
+                  bottom: "6px",
+                  left: 0,
+                  right: 0,
+                  backgroundColor: (theme) =>
+                    alpha(theme.palette.primary.main, 0.7),
+                  color: (theme) => theme.palette.neutral[100],
+                  padding: "10px",
+                  borderRadius: "10px",
+                }}
+              >
+                <Typography fontSize="13px" fontWeight="600" textAlign="center">
+                  {`${storeDetails?.discount?.discount}% ${text1}  ${getAmountWithSign(
+                    storeDetails?.discount?.min_purchase
+                  )} ${max} ${getAmountWithSign(
+                    storeDetails?.discount?.max_discount
+                  )}, ${text2}`}
+
+                </Typography>
+              </Stack>
+            ) : null}
             {bannersData?.length ? (
               <Slider {...settings}>
                 {bannersData?.map((banner) => {
@@ -250,6 +284,7 @@ const Top = (props) => {
                       onClick={() => handleBannerClick(banner?.default_link)}
                       sx={{
                         cursor: "pointer",
+                        borderBottomRightRadius:"10px"
                       }}
                     >
                       <CustomImageContainer
@@ -429,9 +464,7 @@ const Top = (props) => {
                         },
                       }}
                     >
-                      {storeDetails?.positive_rating.toFixed(
-                        configData?.digit_after_decimal_point
-                      )}
+                     {storeDetails?.positive_rating.toFixed(0)}%
                     </Typography>
                     <Stack direction="row" alignItems="center" spacing={0.3}>
                       <Typography
@@ -500,7 +533,7 @@ const Top = (props) => {
     } else {
       return (
         <CustomStackFullWidth direction="row">
-          <ContentWrapper>
+          <ContentWrapper >
             <CustomImageContainer
               src={bannerCover}
               width="100%"
@@ -508,6 +541,7 @@ const Top = (props) => {
               objectFit="cover"
               borderRadius="10px"
             />
+
             <ContentBox>
               <CustomBoxFullWidth
                 sx={{
@@ -658,6 +692,13 @@ const Top = (props) => {
                           </RoundedIconButton>
                         </Tooltip>
                       </Box>
+                      <Box mt="10px">
+                        <Tooltip title={"Location"} arrow placement={"bottom"}>
+                          <RoundedIconButton onClick={()=>setOpenShareModel(true)}>
+                            <ShareOutlinedIcon color="primary" />
+                          </RoundedIconButton>
+                        </Tooltip>
+                      </Box>
                     </Grid>
                   </Grid>
                 </CustomBoxFullWidth>
@@ -733,7 +774,33 @@ const Top = (props) => {
               </CustomBoxFullWidth>
             </ContentBox>
           </ContentWrapper>
-          <Stack width="50%">
+          <Stack width="50%" sx={{position:"relative",}}>
+            {storeDetails?.discount ? (
+              <Stack
+                sx={{
+                  position: "absolute",
+                  bottom:"6px",
+                  left: 0,
+                  right: 0,
+                  backgroundColor: (theme) =>
+                    alpha(theme.palette.primary.main, 0.7),
+                  color: (theme) => theme.palette.neutral[100],
+                  padding: "10px",
+                  borderRadius: "0px",
+                  borderBottomRightRadius:"10px",
+                  zIndex: 999,
+                }}
+              >
+                <Typography fontSize="13px" fontWeight="600" textAlign="center">
+                  {`${storeDetails?.discount?.discount}% ${text1}  ${getAmountWithSign(
+                    storeDetails?.discount?.min_purchase
+                  )} ${max} ${getAmountWithSign(
+                    storeDetails?.discount?.max_discount
+                  )}, ${text2}`}
+
+                </Typography>
+              </Stack>
+            ) : null}
             {!isLoading ? (
               <>
                 {bannersData?.length ? (
@@ -748,7 +815,7 @@ const Top = (props) => {
                           sx={{
                             cursor: "pointer",
                             width: "100%",
-                            borderRadius: "10px",
+                            borderTopRightRadius:"10%", borderBottomRightRadius:"10%"
                           }}
                         >
                           <CustomImageContainer
@@ -756,18 +823,24 @@ const Top = (props) => {
                             width="100%"
                             height="251px"
                             objectFit="cover"
+                            borderRadius="10px"
                           />
                         </Stack>
                       );
                     })}
                   </Slider>
                 ) : (
-                  <CustomImageContainer
-                    src={bannerCover}
-                    width="100%"
-                    height="250px"
-                    objectFit="cover"
-                  />
+                  <Stack sx={{borderTopRightRadius:"10%", borderBottomRightRadius:"10%"}}>
+                    <CustomImageContainer
+                      src={bannerCover}
+                      width="100%"
+                      height="251px"
+                      objectFit="cover"
+                      borderTopRightRadius="10%"
+                      borderBottomRightRadius="10%"
+                    />
+                  </Stack>
+
                 )}
               </>
             ) : (
@@ -793,6 +866,11 @@ const Top = (props) => {
           storeDetails={storeDetails}
         />
       )}
+      {openShareModel&&<StoreShare
+        handleCopy={handleCopy}
+        setOpenShareModal={setOpenShareModel}
+        openShareModal={openShareModel}
+      />}
     </>
   );
 };

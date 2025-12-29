@@ -15,8 +15,6 @@ const ProductReviewCard = ({ review, storename }) => {
   const { configData } = useSelector((state) => state.configData);
   const [openModal, setOpenModal] = useState(false);
   const theme = useTheme();
-  const userImageUrl = configData?.base_urls?.customer_image_url;
-
   return (
     <>
       <CustomStackFullWidth

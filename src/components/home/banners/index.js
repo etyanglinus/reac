@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Grid, Skeleton, styled } from "@mui/material";
+import {Grid, Skeleton, styled, useMediaQuery, useTheme} from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +17,7 @@ import {
 } from "styled-components/CustomStyles.style";
 import CustomImageContainer from "../../CustomImageContainer";
 import FoodDetailModal from "../../food-details/foodDetail-modal/FoodDetailModal";
+import NextImage from "components/NextImage";
 
 export const BannersWrapper = styled(Box)(({ theme }) => ({
   cursor: "pointer",
@@ -25,6 +26,11 @@ export const BannersWrapper = styled(Box)(({ theme }) => ({
   height: "234px",
   position: "relative",
   overflow: "hidden",
+  img:{
+    width:'100%',
+    height:'100%',
+  },
+
 
   "&:hover": {
     img: {
@@ -40,26 +46,29 @@ export const BannersWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-const Banners = () => {
+const Banners = ({feature}) => {
   const router = useRouter();
+  const theme=useTheme()
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isExtraSmallScreen = useMediaQuery(theme.breakpoints.down("xs"));
   const { selectedModule } = useSelector((state) => state.utilsData);
   const { banners } = useSelector((state) => state.storedData);
-  const { data, refetch: refetchBannerData, isFetching } = useGetBanners();
+  const { data, refetch: refetchBannerData, isFetched } = useGetBanners(feature);
   const [bannersData, setBannersData] = useState([]);
   const [foodBanner, setFoodBanner] = useState();
   const [openModal, setOpenModal] = useState(false);
   const { configData } = useSelector((state) => state.configData);
   const dispatch = useDispatch();
-  useEffect(() => {
-    if (banners.banners.length === 0) {
-      refetchBannerData();
-    }
-  }, [banners]);
-  useEffect(() => {
-    if (data) {
-      dispatch(setBanners(data));
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (banners.banners.length === 0) {
+  //     refetchBannerData();
+  //   }
+  // }, [banners]);
+  // useEffect(() => {
+  //   if (data) {
+  //     dispatch(setBanners(data));
+  //   }
+  // }, [data]);
   useEffect(() => {
     if (banners) {
       handleBannersData();
@@ -88,14 +97,21 @@ const Banners = () => {
   };
   const handleBannerClick = (banner) => {
     if (banner?.isCampaign) {
+
       router.push(
-        {
-          pathname: "/campaigns/[id]",
-          query: { id: `${banner?.id}`, module_id: `${getModuleId()}` },
-        },
-        undefined,
-        { shallow: true }
-      );
+          {
+            pathname: "/campaigns/[id]",
+            query: { id: `${banner?.id}`, module_id: `${getModuleId()}` },
+          },
+          undefined,
+          { scroll: false } // Disable Next.js auto scroll
+        )
+        .then(() => {
+          // Add slight delay to ensure new page is mounted
+          setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }, 100); // delay helps after DOM updates
+        });
     } else if (banner?.type === "default") {
       window.open(banner?.link, "_blank");
     } else {
@@ -197,59 +213,61 @@ const Banners = () => {
   return (
     <>
       <CustomStackFullWidth
-        sx={{
-          mt: "10px",
-          "& .slick-list": {
-            marginRight: { xs: "-10px", sm: "-20px" },
-          },
-          "& .slick-slide": {
-            paddingRight: { xs: "10px", sm: "20px" },
-          },
-        }}
+          sx={{
+            mt: "10px",
+            "& .slick-list": {
+              marginRight: { xs: "-10px", sm: "-20px" },
+            },
+            "& .slick-slide": {
+              paddingRight: { xs: "10px", sm: "20px" },
+            },
+          }}
       >
-        {isFetching ? (
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Slider {...settings}>
-                {[...Array(getModuleWiseBanners())].map((index) => {
-                  return (
-                    <BannersWrapper key={index}>
-                      <Skeleton
-                        variant="rectangle"
-                        // width="100%"
-                        height="100%"
-                      />
-                    </BannersWrapper>
-                  );
-                })}
-              </Slider>
-            </Grid>
-          </Grid>
-        ) : (
-          <SliderCustom>
+        {!isFetched ? (
             <Slider {...settings}>
-              {bannersData?.length > 0 &&
-                bannersData?.map((item, index) => {
-                  return (
-                    <BannersWrapper
-                      key={index}
-                      onClick={() => handleBannerClick(item)}
-                    >
-                      <CustomImageContainer
-                        src={item?.image_full_url}
-                        alt={item?.title}
+              {[...Array(2)].map((_, index) => (
+                  <BannersWrapper key={index}>
+                    <Skeleton
+                        variant="rectangular"
                         height="100%"
                         width="100%"
-                        objectfit="cover"
-                        borderRadius="10px"
-                      />
-                    </BannersWrapper>
-                  );
-                })}
+                    />
+                  </BannersWrapper>
+              ))}
             </Slider>
-          </SliderCustom>
+        ) : (
+            bannersData?.length > 0 && (
+                <SliderCustom>
+                  <Slider {...settings}>
+                    {bannersData.map((item, index) => (
+                      <BannersWrapper
+                        key={index}
+                        onClick={
+                          item?.type === "default" && item?.link===null
+                            ? undefined
+                            : () => handleBannerClick(item)
+                        }
+                        sx={{
+                          cursor:
+                            item?.type === "default" && item?.link===null ? "default" : "pointer",
+                        }}
+                      >
+                        <NextImage
+                          src={item?.image_full_url}
+                          alt={item?.title}
+                          height={isExtraSmallScreen ? "150" : isSmallScreen ? "200" : "234"}
+                          width={624}
+                          objectFit="cover"
+                          borderRadius="10px"
+                        />
+                      </BannersWrapper>
+                    ))}
+                  </Slider>
+                </SliderCustom>
+            )
         )}
       </CustomStackFullWidth>
+
       {openModal && foodBanner && (
         <FoodDetailModal
           product={foodBanner}

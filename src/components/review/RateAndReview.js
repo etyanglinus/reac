@@ -33,13 +33,13 @@ const RateAndReview = () => {
   useEffect(() => {
     id && refetch() && refetchTrackOrder();
   }, [id]);
-
   return (
     <CustomStackFullWidth
       alignItems="center"
       justifyContent="center"
       spacing={2}
       mt="1rem"
+
     >
       <>
         {isRefetching ? (
@@ -59,6 +59,9 @@ const RateAndReview = () => {
           alignItems="center"
           justifyContent="center"
           spacing={3}
+          sx={{
+            maxWidth:"600px"
+          }}
         >
           {type === "items" && data?.module_type !== "parcel" ? (
             data ? (

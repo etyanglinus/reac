@@ -20,12 +20,14 @@ export const getNumberWithConvertedDecimalPoint = (
     );
   }
 };
+
 export const isAvailable = (start, end) => {
   const startTime = moment(start, "HH:mm:ss");
   const endTime = moment(end, "HH:mm:ss");
   let currentTime = moment();
   return moment(currentTime).isBetween(startTime, endTime);
 };
+
 export const handleTotalAmountWithAddons = (
   mainTotalAmount,
   selectedAddOns
@@ -44,6 +46,7 @@ export const handleTotalAmountWithAddons = (
 export const getDateFormat = (date) => {
   return moment(date).format("LL");
 };
+
 export const getDateFormatAnotherWay = (date) => {
   return moment(date).format("ll");
 };
@@ -68,10 +71,12 @@ export const calculateItemBasePrice = (item, selectedOptions) => {
   return basePrice;
   // if(item)
 };
+
 export const FormatedDateWithTime = (date) => {
   let dateString = moment(date).format("YYYY-MM-DD hh:mm a");
   return dateString;
 };
+
 export const onlyTimeFormat = (date) => {
   let timeString = moment(date, "YYYY-MM-DD hh:mm a").format("hh:mm");
   return timeString;
@@ -102,6 +107,7 @@ export const getDayNumber = (day) => {
     }
   }
 };
+
 const handleVariationValuesSum = (productVariations) => {
   let sum = 0;
   if (productVariations.length > 0) {
@@ -115,6 +121,7 @@ const handleVariationValuesSum = (productVariations) => {
   }
   return sum;
 };
+
 const handleValuesSum = (productVariations) => {
   let sum = 0;
   if (productVariations.length > 0) {
@@ -147,6 +154,7 @@ export const handleProductValueWithOutDiscount = (product) => {
     }
   }
 };
+
 export const selectedAddonsTotal = (addOns) => {
   if (addOns?.length > 0) {
     let vv = addOns?.reduce(
@@ -159,6 +167,7 @@ export const selectedAddonsTotal = (addOns) => {
     return 0;
   }
 };
+
 const handleValueWithOutDiscount = (product) => {
   let productPrice = product.price;
   if (product.selectedOption.length > 0) {
@@ -168,6 +177,7 @@ const handleValueWithOutDiscount = (product) => {
     return productPrice;
   }
 };
+
 export const handlePurchasedAmount = (cartList) => {
   if (getCurrentModuleType() === "food") {
     return cartList.reduce(
@@ -192,6 +202,7 @@ export const handlePurchasedAmount = (cartList) => {
     );
   }
 };
+
 export const getCouponDiscount = (couponDiscount, storeData, cartList) => {
   if (couponDiscount) {
     let purchasedAmount = handlePurchasedAmount(cartList);
@@ -302,6 +313,7 @@ export const getTaxableTotalPrice = (
     return (total * tax) / 100;
   }
 };
+
 const handleTotalDiscountBasedOnModules = (
   items,
   restaurentDiscount,
@@ -364,7 +376,7 @@ const handleProductWiseDiscount = (items) => {
       } else {
         let a =
           handleProductValueWithOutDiscount(item) -
-          getConvertDiscount(
+          getConvertDiscountNew(
             item.discount,
             item.discount_type,
             handleProductValueWithOutDiscount(item),
@@ -378,60 +390,69 @@ const handleProductWiseDiscount = (items) => {
   });
   return totalDiscount;
 };
-export const getProductDiscount = (items, storeData) => {
+
+export const getProductDiscount = (items, storeData,diffDiscount) => {
+  const productWiseDiscount = handleProductWiseDiscount(items);
   if (storeData?.discount) {
-    let endDate = storeData?.discount?.end_date;
-    let endTime = storeData?.discount?.end_time;
-    let combinedEndDateTime = moment(
+    const endDate = storeData?.discount?.end_date;
+    const endTime = storeData?.discount?.end_time;
+    const combinedEndDateTime = moment(
       `${endDate} ${endTime}`,
       "YYYY-MM-DD HH:mm:ss"
-    ).format();
-    let currentDateTime = moment().format();
-    if (combinedEndDateTime > currentDateTime) {
-      //shop wise discount
-      let restaurentDiscount = storeData?.discount?.discount;
-      let resDisType = storeData?.discount?.discount_type;
-      let restaurentMinimumPurchase = storeData?.discount?.min_purchase;
-      let restaurentMaxDiscount = storeData?.discount?.max_discount;
-      let totalDiscount = handleTotalDiscountBasedOnModules(
+    );
+    const currentDateTime = moment();
+
+    // Check if the store discount is still valid
+    if (combinedEndDateTime.isAfter(currentDateTime)) {
+     // console.log("Store discount is available");
+      const {
+        discount: restaurentDiscount,
+        discount_type: resDisType,
+        min_purchase: restaurentMinimumPurchase,
+        max_discount: restaurentMaxDiscount,
+      } = storeData.discount;
+
+      // Calculate shop-level total discount
+      const totalDiscount = handleTotalDiscountBasedOnModules(
         items,
         restaurentDiscount,
         resDisType
       );
 
-      let purchasedAmount = items.reduce(
-        (total, product) =>
-          ((product?.food_variations.length > 0
-            ? handleProductValueWithOutDiscount(product)
-            : product?.price) +
-            (product?.selectedAddons?.length > 0
-              ? product?.selectedAddons?.reduce(
-                  (total, addOn) => addOn.price * addOn.quantity + total,
-                  0
-                )
-              : 0)) *
-            product.quantity +
-          total,
-        0
-      );
+      // Calculate total purchased amount
+      const purchasedAmount = items.reduce((total, product) => {
+        const basePrice = product?.food_variations?.length > 0
+          ? handleProductValueWithOutDiscount(product)
+          : product?.selectedOption?.length>0?product?.price + (product?.selectedOption?.reduce?.((sum, opt) => sum + (opt?.price || 0), 0) || 0):product?.price;
+
+
+        const addonPrice = product?.selectedAddons?.length > 0
+          ? product.selectedAddons.reduce(
+            (addonTotal, addOn) => addonTotal + addOn.price * addOn.quantity,
+            0
+          )
+          : 0;
+
+        return total + (basePrice + addonPrice) * product.quantity;
+      }, 0);
+      // If eligible for store discount, calculate the final applicable discount
       if (purchasedAmount >= restaurentMinimumPurchase) {
-        if (totalDiscount >= restaurentMaxDiscount) {
-          return restaurentMaxDiscount;
-        } else {
-          return totalDiscount;
+        const applicableStoreDiscount = Math.min(totalDiscount, restaurentMaxDiscount);
+        if (diffDiscount) {
+          diffDiscount.value = applicableStoreDiscount - productWiseDiscount;
         }
-      } else {
-        return 0;
+
+        // ✅ Return the higher discount: store vs product
+        return Math.max(applicableStoreDiscount, productWiseDiscount);
       }
-    } else {
-      //product wise discount
-      return handleProductWiseDiscount(items);
     }
-  } else {
-    //product wise discount
-    return handleProductWiseDiscount(items);
   }
+
+  // Return product-wise discount if no valid store-wide discount
+  return productWiseDiscount;
 };
+
+
 export const getConvertDiscount = (dis, disType, price, restaurantDiscount) => {
   if (restaurantDiscount === 0) {
     if (dis !== 0) {
@@ -446,6 +467,17 @@ export const getConvertDiscount = (dis, disType, price, restaurantDiscount) => {
     return price - (price * restaurantDiscount) / 100;
   }
 };
+export const getConvertDiscountNew = (dis, disType, price, restaurantDiscount) => {
+  if (dis !== 0) {
+    if (disType === "amount") {
+      price = price - dis;
+    } else if (disType === "percent") {
+      price = price - (dis / 100) * price;
+    }
+  }
+  return price;
+};
+
 export const getFinalTotalPrice = (
   items,
   couponDiscount,
@@ -466,6 +498,7 @@ export const getFinalTotalPrice = (
   }
   return totalPrice;
 };
+
 export const currentTime = moment(currentDate).format("HH:mm");
 
 function recursive(start, end, close, list, schedule_order_slot_duration, day) {
@@ -554,6 +587,7 @@ function radians(degrees) {
 const degrees = (doubleRadiance) => {
   return doubleRadiance * (180 / Math.PI);
 };
+
 const toRadians = (degree) => {
   return (degree * Math.PI) / 180;
 };
@@ -578,9 +612,10 @@ function distanceInKmBetweenEarthCoordinates(lat1, lon1, lat2, lon2) {
 }
 
 export const handleDistance = (distance, origin, destination) => {
-  if (distance?.[0]?.distance?.value) {
-    return distance?.[0]?.distance?.value / 1000;
-  } else if (distance?.[0]?.status === "ZERO_RESULTS") {
+
+  if (typeof distance?.distanceMeters === 'number') {
+    return Number(distance?.distanceMeters) / 1000;
+  } else if (distance?.status === "ZERO_RESULTS") {
     return (
       distanceInKmBetweenEarthCoordinates(
         origin?.latitude || origin?.lat,
@@ -593,6 +628,7 @@ export const handleDistance = (distance, origin, destination) => {
     return 0;
   }
 };
+
 export const cartItemsTotalAmount = (cartList) => {
   let totalAmount = 0;
   if (cartList?.length > 0) {
@@ -635,21 +671,30 @@ export const getInfoFromZoneData = (zoneData) => {
   }
   return chargeInfo;
 };
+
 export let bad_weather_fees = 0;
-const getDeliveryFeeByBadWeather = (
+
+export const getDeliveryFeeByBadWeather = (
   charge,
-  increasedDeliveryFee,
-  increasedDeliveryFeeStatus
+  surgePrice
 ) => {
   const totalCharge = charge;
-  if (increasedDeliveryFeeStatus === 1) {
-    const tempValue = totalCharge * (increasedDeliveryFee / 100);
-    bad_weather_fees = tempValue;
-    return totalCharge + tempValue;
-  } else {
+
+  if(Number(surgePrice?.price)>0){
+    if(surgePrice?.price_type==="percent"){
+        const tempValue = totalCharge * (Number(surgePrice?.price) / 100);
+        bad_weather_fees = tempValue;
+        return totalCharge + tempValue;
+    }else{
+        bad_weather_fees = Number(surgePrice?.price);
+        return totalCharge + Number(surgePrice?.price);
+    }
+  }else {
     return totalCharge;
   }
+
 };
+
 export const getDeliveryFees = (
   storeData,
   configData,
@@ -661,25 +706,35 @@ export const getDeliveryFees = (
   zoneData,
   origin,
   destination,
-  extraCharge
+  extraCharge,
+  surgePrice
 ) => {
   if (orderType === "delivery" || orderType === "schedule_order") {
     //convert m to km
     let convertedDistance = handleDistance(
-      distance?.rows?.[0]?.elements,
+        distance,
       origin,
       destination
     );
     let deliveryFee = convertedDistance * configData?.per_km_shipping_charge;
-
     let totalOrderAmount = cartItemsTotalAmount(cartList);
+    const isAdminFreeDeliveryEnabled = configData?.admin_free_delivery?.status === true;
+    const freeDeliveryType = configData?.admin_free_delivery?.type;
+    const freeDeliveryThreshold = configData?.admin_free_delivery?.free_delivery_over;
+    const isFreeDeliveryByAmount =
+      freeDeliveryType === "free_delivery_by_order_amount" &&
+      freeDeliveryThreshold > 0 &&
+      totalOrderAmount >= freeDeliveryThreshold;
+    const isFreeDeliveryToAllStores = freeDeliveryType === "free_delivery_to_all_store";
     //restaurant self delivery system checking
-    if (Number.parseInt(storeData?.self_delivery_system) === 1) {
-      if (storeData?.free_delivery) {
+    if (Number.parseInt(storeData?.self_delivery_system ) === 1) {
+      const storeWiseDeliveryFee = convertedDistance * storeData?.per_km_shipping_charge || 0;
+
+      if (storeData?.free_delivery || ((isAdminFreeDeliveryEnabled && (isFreeDeliveryByAmount || isFreeDeliveryToAllStores)))) {
         return 0;
       } else {
         deliveryFee =
-          convertedDistance * storeData?.per_km_shipping_charge || 0;
+          storeWiseDeliveryFee
         if (
           deliveryFee >= storeData?.minimum_shipping_charge &&
           deliveryFee <= storeData.maximum_shipping_charge
@@ -699,51 +754,55 @@ export const getDeliveryFees = (
     } else {
       if (zoneData?.data?.zone_data?.length > 0) {
         const chargeInfo = getInfoFromZoneData(zoneData);
-        if (
-          chargeInfo?.pivot?.per_km_shipping_charge !== null &&
-          chargeInfo?.pivot?.per_km_shipping_charge >= 0
-        ) {
-          deliveryFee =
-            convertedDistance *
-            (chargeInfo?.pivot?.per_km_shipping_charge || 0);
-          if (
-            (configData?.free_delivery_over !== null &&
-              configData?.free_delivery_over > 0 &&
-              totalOrderAmount >= configData?.free_delivery_over) ||
-            orderType === "take_away"
-          ) {
+        if(chargeInfo?.pivot?.delivery_charge_type ==="fixed"){
+          if((isAdminFreeDeliveryEnabled && (isFreeDeliveryByAmount || isFreeDeliveryToAllStores)) ||
+            orderType === "take_away") {
             return 0;
-          } else if (
-            deliveryFee <= chargeInfo?.pivot?.minimum_shipping_charge
+          }else{
+            return getDeliveryFeeByBadWeather(chargeInfo?.pivot?.fixed_shipping_charge + extraCharge,surgePrice);
+          }
+        }else{
+          if (
+            chargeInfo?.pivot?.per_km_shipping_charge !== null &&
+            chargeInfo?.pivot?.per_km_shipping_charge >= 0
           ) {
-            return getDeliveryFeeByBadWeather(
-              chargeInfo?.pivot?.minimum_shipping_charge + extraCharge,
-              chargeInfo?.increased_delivery_fee,
-              chargeInfo?.increased_delivery_fee_status
-            );
-          } else if (
-            deliveryFee >= chargeInfo?.pivot?.maximum_shipping_charge &&
-            chargeInfo?.pivot?.maximum_shipping_charge !== null
-          ) {
-            return getDeliveryFeeByBadWeather(
-              chargeInfo?.pivot?.maximum_shipping_charge + extraCharge,
-              chargeInfo?.increased_delivery_fee,
-              chargeInfo?.increased_delivery_fee_status
-            );
-          } else {
-            return getDeliveryFeeByBadWeather(
-              deliveryFee + extraCharge,
-              chargeInfo?.increased_delivery_fee,
-              chargeInfo?.increased_delivery_fee_status
-            );
+            deliveryFee =
+              convertedDistance *
+              (chargeInfo?.pivot?.per_km_shipping_charge || 0);
+            if((isAdminFreeDeliveryEnabled && (isFreeDeliveryByAmount || isFreeDeliveryToAllStores)) ||
+              orderType === "take_away") {
+              return 0;
+            } else if (
+              deliveryFee <= chargeInfo?.pivot?.minimum_shipping_charge
+            ) {
+              return getDeliveryFeeByBadWeather(
+                chargeInfo?.pivot?.minimum_shipping_charge + extraCharge,
+                surgePrice
+              );
+            } else if (
+              deliveryFee >= chargeInfo?.pivot?.maximum_shipping_charge &&
+              chargeInfo?.pivot?.maximum_shipping_charge !== null
+            ) {
+              return getDeliveryFeeByBadWeather(
+                chargeInfo?.pivot?.maximum_shipping_charge + extraCharge,
+                surgePrice
+              );
+            } else {
+              return getDeliveryFeeByBadWeather(
+                deliveryFee + extraCharge,
+                surgePrice
+              );
+            }
           }
         }
+
       }
     }
   } else {
     return 0;
   }
 };
+
 export const getItemTotalWithoutDiscount = (item) => {
   return item?.price + handleVariationValuesSum(item.food_variations);
 };
@@ -809,19 +868,17 @@ export const getCalculatedTotal = (
   extraCharge,
   additionalCharge,
   packagingCharge,
-  referDiscount
+  referDiscount,
+  vatAmount,
+  surgePrice
 ) => {
+  const taxAmount=vatAmount|| 0
   if (couponDiscount) {
     if (couponDiscount?.coupon_type === "free_delivery") {
       return (
         getSubTotalPrice(cartList) -
         getProductDiscount(cartList, storeData) +
-        handleTaxIncludeExclude(
-          cartList,
-          couponDiscount,
-          storeData,
-          referDiscount
-        ) -
+        taxAmount -
         (couponDiscount
           ? getCouponDiscount(couponDiscount, storeData, cartList)
           : 0)
@@ -830,12 +887,7 @@ export const getCalculatedTotal = (
       return (
         getSubTotalPrice(cartList) -
         getProductDiscount(cartList, storeData) +
-        handleTaxIncludeExclude(
-          cartList,
-          couponDiscount,
-          storeData,
-          referDiscount
-        ) -
+        taxAmount -
         (couponDiscount
           ? getCouponDiscount(couponDiscount, storeData, cartList)
           : 0) +
@@ -850,7 +902,8 @@ export const getCalculatedTotal = (
           zoneData,
           origin,
           destination,
-          extraCharge
+          extraCharge,
+          surgePrice
         ) +
         deliveryTip +
         additionalCharge +
@@ -861,12 +914,7 @@ export const getCalculatedTotal = (
     return (
       getSubTotalPrice(cartList) -
       getProductDiscount(cartList, storeData) +
-      handleTaxIncludeExclude(
-        cartList,
-        couponDiscount,
-        storeData,
-        referDiscount
-      ) -
+      taxAmount -
       0 +
       getDeliveryFees(
         storeData,
@@ -879,7 +927,8 @@ export const getCalculatedTotal = (
         zoneData,
         origin,
         destination,
-        extraCharge
+        extraCharge,
+        surgePrice
       ) +
       deliveryTip +
       additionalCharge +
@@ -1077,8 +1126,8 @@ export function capitalizeText(text) {
     .join(" "); // Join the words back into a string
 }
 export function formatPhoneNumber(number) {
-  const str = number.toString();
-  if (str.startsWith("+")) {
+  const str = number?.toString();
+  if (str?.startsWith("+")) {
     return str;
   } else {
     return `+${str}`;
@@ -1116,4 +1165,14 @@ export function maskSensitiveInfo(input) {
       return input.slice(0, 4) + maskedSection + input.slice(-3);
     }
   }
+}
+// utils/debounce.js
+export function debounce(func, delay = 500) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
 }

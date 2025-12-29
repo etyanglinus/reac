@@ -13,8 +13,6 @@ const RouteLinks = (props) => {
   const dispatch = useDispatch();
   const { selectedModule } = useSelector((state) => state.utilsData);
 
-
-  
   const { token, configData } = props;
   const { t } = useTranslation();
   const router = useRouter();
@@ -57,11 +55,15 @@ const RouteLinks = (props) => {
   return (
     <CustomStackFullWidth spacing={2} alignItems={{ xs: "start" }}>
       {RouteLinksData.map((item, index) => {
+        if((!configData?.toggle_dm_registration && item.value==="delivery_man") || (!configData?.toggle_dm_registration && item?.value==="restaurant_owner") )
+          return null
+
         return (
           <Typography
             key={index}
             onClick={() => handleClick(item.link, item.value)}
             sx={{
+              textAlign:"left",
               cursor: "pointer",
               "&:hover": {
                 color: theme.palette.primary.main,

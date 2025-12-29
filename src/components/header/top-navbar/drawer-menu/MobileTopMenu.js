@@ -82,7 +82,6 @@ const MobileTopMenu = ({
   const latest = t("Latest");
 
 
-
   const collapsableMenu = {
     cat: {
       text: "Categories",

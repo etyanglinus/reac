@@ -23,17 +23,21 @@ const AdditionalAddresses = (props) => {
 		saveAddress,
 		address,
 		setAddress,
+		orderType,
 	} = props;
 	const [street, setStreet] = useState(
 		additionalInformationStates.streetNumber
 	);
 	const [house, setHouse] = useState(additionalInformationStates.houseNumber);
 	const [floor, setFloor] = useState(additionalInformationStates.floor);
+
 	useEffect(() => {
-		setStreet(address?.road ?? "");
-		setHouse(address?.house ?? "");
-		setFloor(address?.floor ?? "");
+		 setStreet(address?.road || "");
+		 setHouse(address?.house || "");
+		setFloor(address?.floor || " " );
 	}, [address?.house, address?.road, address?.floor]);
+
+
 	const handleStreetChange = (e) => {
 		setStreet(e.target.value);
 		additionalInformationDispatch({
@@ -63,8 +67,14 @@ const AdditionalAddresses = (props) => {
 		}
 	};
 	useEffect(() => {
-		setAddress({ ...address, road: street, house: house, floor: floor });
+		if (orderType !== "take_away") {
+			setAddress({ ...address, road: street, house: house, floor: floor });
+		}
+		// return () => {
+		// 	setAddress({ ...address, road: "", house: "", floor: "" });
+		// };
 	}, [street, house, floor]);
+
 	return (
 		// eslint-disable-next-line react/jsx-no-undef
 		<CustomStackFullWidth>

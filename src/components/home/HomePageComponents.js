@@ -49,18 +49,20 @@ const HomePageComponents = ({ configData, landingPageData }) => {
 	const { profileInfo } = useSelector((state) => state.profileInfo);
 	const router = useRouter();
 	const dispatch = useDispatch();
+	const token = getToken();
 	const { welcomeModal } = useSelector((state) => state.utilsData);
 	const moduleType = getCurrentModuleType();
+
 
 	const zoneid =
 		typeof window !== "undefined"
 			? localStorage.getItem("zoneid")
 			: undefined;
-	const token = getToken();
+
 
 	useEffect(() => {
 		window.scrollTo(0, 0);
-	}, []);
+	}, [router.query.search]);
 
 	const onSuccessHandler = (response) => {
 		setWishListsData(response);
@@ -227,7 +229,7 @@ const HomePageComponents = ({ configData, landingPageData }) => {
 					/>
 					<Box maxWidth={"308px"} mx={"auto"} mt={2}>
 						<Typography variant="h6" color="primary" mb={2}>
-							{t("Welcome to 6amMart!")}
+							{t(`Welcome to ! ${configData?.business_name}`)}
 						</Typography>
 						<Typography variant="body2" lineHeight={"1.5"}>
 							{profileInfo?.is_valid_for_discount

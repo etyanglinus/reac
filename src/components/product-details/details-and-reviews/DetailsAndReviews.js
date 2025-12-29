@@ -105,7 +105,6 @@ const DetailsAndReviews = (props) => {
 	});
 
 
-
 	useEffect(() => {
 		if (
 			contentRef.current &&
@@ -128,7 +127,6 @@ const DetailsAndReviews = (props) => {
 			refetch();
 		}
 	}, [productId, offSet]);
-
 
 	return (
 		<Wrapper>

@@ -25,6 +25,8 @@ import { CustomTypography } from "components/landing-page/hero-section/HeroSecti
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import PhoneOrEmailIcon from "components/auth/asset/PhoneOrEmailIcon";
+import { useDispatch } from "react-redux";
+import { setOpenForgotPasswordModal } from "redux/slices/utils";
 
 const SignInForm = ({
   loginFormik,
@@ -37,11 +39,15 @@ const SignInForm = ({
   handleSignUp,
   only,
   handleClick,
+  handleClose,
+  isRemember,
 }) => {
   const lanDirection = getLanguage() ? getLanguage() : "ltr";
+
   const theme = useTheme();
   const textColor = theme.palette.whiteContainer.main;
   const [isPhone, setIsPhone] = useState("");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const value = loginFormik.values.email_or_phone;
@@ -53,8 +59,9 @@ const SignInForm = ({
       setIsPhone("email");
     }
   }, [loginFormik.values.email_or_phone]);
+
   return (
-    <form noValidate onSubmit={loginFormik.handleSubmit}>
+    <form noValidate onSubmit={loginFormik.handleSubmit} id="signin-form">
       <CustomStackFullWidth alignItems="center">
         <CustomStackFullWidth
           spacing={{ xs: 2, md: 3 }}
@@ -62,6 +69,7 @@ const SignInForm = ({
         >
           {isPhone === "phone" ? (
             <CustomPhoneInputManual
+              id="signin-phone-input"
               value={loginFormik.values.email_or_phone}
               onHandleChange={handleOnChange}
               initCountry={configData?.country}
@@ -74,6 +82,7 @@ const SignInForm = ({
             />
           ) : (
             <CustomTextFieldWithFormik
+              id="signin-email-input"
               autoFocus={isPhone === "email" && true}
               required
               label={t("Email/Phone")}
@@ -89,7 +98,7 @@ const SignInForm = ({
                     sx={{
                       color:
                         loginFormik.touched.email_or_phone &&
-                        !loginFormik.errors.email_or_phone
+                          !loginFormik.errors.email_or_phone
                           ? theme.palette.primary.main
                           : alpha(theme.palette.neutral[500], 0.4),
                     }}
@@ -98,13 +107,19 @@ const SignInForm = ({
               }
             />
           )}
-
+          {/* <TextField
+        id="email-input" // 👈 unique id
+        label="Email"
+        variant="outlined"
+        fullWidth
+      /> */}
           <CustomTextFieldWithFormik
+            id="signin-password-input"
             height="45px"
             required="true"
             type="password"
             label={t("Password")}
-            placeholder={t("Enter password")}
+            placeholder={t("Minimum 8 characters")}
             touched={loginFormik.touched.password}
             errors={loginFormik.errors.password}
             fieldProps={loginFormik.getFieldProps("password")}
@@ -116,7 +131,7 @@ const SignInForm = ({
                   sx={{
                     color:
                       loginFormik.touched.password &&
-                      !loginFormik.errors.password
+                        !loginFormik.errors.password
                         ? theme.palette.primary.main
                         : alpha(theme.palette.neutral[500], 0.6),
                   }}
@@ -134,9 +149,11 @@ const SignInForm = ({
             <FormControlLabel
               control={
                 <Checkbox
+                  id="signin-remember-checkbox"
                   value="remember"
                   color="primary"
                   onChange={rememberMeHandleChange}
+                  checked={isRemember || false}
                 />
               }
               label={
@@ -146,7 +163,11 @@ const SignInForm = ({
               }
             />
             <CustomLink
-              href="/forgot-password"
+              id="signin-forgot-password-link"
+              onClick={() => {
+                dispatch(setOpenForgotPasswordModal(true));
+                handleClose();
+              }}
               sx={{ fontWeight: "400", fontSize: "14px" }}
             >
               {t("Forgot password?")}
@@ -154,10 +175,10 @@ const SignInForm = ({
           </CustomStackFullWidth>
           <CustomStackFullWidth sx={{ paddingBottom: "5px" }}>
             <CustomColouredTypography
+              id="signin-terms-link"
               onClick={handleClick}
               sx={{
                 cursor: "pointer",
-                // textDecoration: 'underline',
                 fontWeight: "400",
                 fontSize: "12px",
                 [theme.breakpoints.down("sm")]: {
@@ -176,22 +197,19 @@ const SignInForm = ({
                   fontSize: "12px",
                 }}
               >
-                {t(" Terms & Conditions")}
+                {" "} {t("Terms & Conditions")}
               </Typography>
             </CustomColouredTypography>
           </CustomStackFullWidth>
-          {/*<AcceptTermsAndConditions*/}
-          {/*  handleCheckbox={handleCheckbox}*/}
-          {/*  formikType={loginFormik}*/}
-          {/*/>*/}
+
           <CustomStackFullWidth spacing={2}>
             <LoadingButton
+              id="signin-submit-button"
               type="submit"
               fullWidth
               variant="contained"
               loading={isLoading}
               sx={{ color: textColor }}
-              id="recaptcha-container"
             >
               {t("Sign In")}
             </LoadingButton>
@@ -208,6 +226,7 @@ const SignInForm = ({
                     {t("Don't have an account?")}
                   </CustomTypography>
                   <span
+                    id="signin-signup-link"
                     onClick={handleSignUp}
                     style={{
                       color: theme.palette.primary.main,

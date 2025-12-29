@@ -26,8 +26,6 @@ const AddressReselect = ({ location, setOpenDrawer }) => {
     currentLatLngForMar = JSON.parse(localStorage.getItem("currentLatLng"));
   }
 
-
-
   let currentLatLng;
   useEffect(() => {
     let currentLatLng;

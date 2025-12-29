@@ -49,8 +49,9 @@ const DeliveryDetails = (props) => {
 		passwordHandler,
 		check,
 		setCheck,
+		isHomeDelivery,
+		page
 	} = props;
-
 	const { t } = useTranslation();
 	const theme = useTheme();
 	const isSmall = useMediaQuery("(max-width:490px)");
@@ -80,7 +81,7 @@ const DeliveryDetails = (props) => {
 			<DeliveryCaption const id="demo-row-radio-buttons-group-label">
 				{t("Delivery Options")}
 			</DeliveryCaption>
-			{storeData && (
+			{storeData &&  (
 				<Stack
 					direction="row"
 					width="100%"
@@ -88,40 +89,43 @@ const DeliveryDetails = (props) => {
 					gap={{ xs: "5px", md: "10px" }}
 					sx={{ flexWrap: { xs: "wrap", sm: "wrap", md: "nowrap" } }}
 				>
-					<DeliveryOptionButton
-						fullwidth="true"
-						orderType={orderType === "delivery"}
-						onClick={() => handleOrderType("delivery")}
-						hover="true" // Use the hover prop here
-						sx={{
-							"&:hover": {
-								color: (theme) =>
-									theme.palette.whiteContainer.main,
-							},
-						}}
-					>
-						<CustomImageContainer
-							src={homeImg.src}
-							width="30px"
-							height="30px"
-							smWidth="20px"
-							smHeight="20px"
-						/>
-						<Typography
-							className="text"
-							fontSize={{ xs: "12px", md: "14px" }}
-							fontWeight={
-								orderType === "delivery" ? "600" : "400"
-							}
-							color={
-								orderType === "delivery"
-									? theme.palette.whiteContainer.main
-									: theme.palette.neutral[700]
-							}
+					{ isHomeDelivery===1 && (
+						<DeliveryOptionButton
+							fullwidth="true"
+							orderType={orderType === "delivery"}
+							onClick={() => handleOrderType("delivery")}
+							hover="true" // Use the hover prop here
+							sx={{
+								"&:hover": {
+									color: (theme) =>
+										theme.palette.whiteContainer.main,
+								},
+							}}
 						>
-							{t("Home Delivery")}
-						</Typography>
-					</DeliveryOptionButton>
+							<CustomImageContainer
+								src={homeImg.src}
+								width="30px"
+								height="30px"
+								smWidth="20px"
+								smHeight="20px"
+							/>
+							<Typography
+								className="text"
+								fontSize={{ xs: "12px", md: "14px" }}
+								fontWeight={
+									orderType === "delivery" ? "600" : "400"
+								}
+								color={
+									orderType === "delivery"
+										? theme.palette.whiteContainer.main
+										: theme.palette.neutral[700]
+								}
+							>
+								{t("Home Delivery")}
+							</Typography>
+						</DeliveryOptionButton>
+					)}
+
 					{!forprescription && configData?.takeaway_status === 1 ? (
 						<>
 							{storeData?.take_away && (
@@ -159,7 +163,7 @@ const DeliveryDetails = (props) => {
 							)}
 						</>
 					) : null}
-					{storeData?.schedule_order && (
+					{!forprescription &&  storeData?.schedule_order && getToken() && (
 						<DeliveryOptionButton
 							fullwidth="true"
 							orderType={orderType === "schedule_order"}
@@ -217,7 +221,7 @@ const DeliveryDetails = (props) => {
 						<Stack>
 							<FormControlLabel
 								onChange={(e) => handleCheckbox(e)}
-								control={<Checkbox />}
+								control={<Checkbox checked={check} />}
 								label={
 									<Typography
 										fontWeight="500"

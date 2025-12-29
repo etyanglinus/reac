@@ -24,7 +24,6 @@ const ProfileBody = ({
   refetch,
   setEditAddress,
 }) => {
-
   const activeComponent = () => {
     if (page === "profile-settings") {
       return (

@@ -30,7 +30,7 @@ const CustomPhoneNumberInputStyled = styled(PhoneInput)(
       right: languageDirection === "rtl" && "11px",
     },
     "&.react-tel-input .flag-dropdown.open .selected-flag": {
-      backgroundColor: theme.palette.background.default,
+      backgroundColor: theme.palette.neutral[100],
     },
     "&.react-tel-input .country-list .search-box": {
       backgroundColor: theme.palette.background.custom2,
@@ -46,7 +46,7 @@ const CustomPhoneNumberInputStyled = styled(PhoneInput)(
       display: "none",
     },
     "&.react-tel-input .selected-flag": {
-      backgroundColor: theme.palette.neutral[300],
+      backgroundColor: theme.palette.neutral[100],
       borderRadius: "10px 0px 0px 10px !important",
       "&:hover": {
         backgroundColor: theme.palette.background.custom2,
@@ -123,7 +123,8 @@ const CustomPhoneInput = ({
   lanDirection,
   height,
   borderRadius,
-                            background
+                            background,
+                            removeLabel
 }) => {
   const changeHandler = (e) => {
     onHandleChange(e);

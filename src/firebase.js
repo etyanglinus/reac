@@ -6,19 +6,24 @@ import {
   isSupported,
 } from "firebase/messaging";
 import { getAuth } from "firebase/auth";
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDEjGFJ53GR6_HWgojuHiaW2YJHG96MCtY",
-  authDomain: "nobo-5255d.firebaseapp.com",
-  projectId: "nobo-5255d",
-  storageBucket: "nobo-5255d.firebasestorage.app",
-  messagingSenderId: "57986059959",
-  appId: "1:57986059959:web:7cb1551959c05e0f714732",
-  measurementId: "G-17R4YFQQ76"
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
 };
+
 const firebaseApp = !getApps().length
   ? initializeApp(firebaseConfig)
   : getApp();
-const messaging = (async () => {
+
+export const auth = getAuth(firebaseApp);
+
+// Correctly export a promise that resolves to messaging instance (or null)
+export const getMessagingObject = async () => {
   try {
     const isSupportedBrowser = await isSupported();
     if (isSupportedBrowser) {
@@ -26,41 +31,45 @@ const messaging = (async () => {
     }
     return null;
   } catch (err) {
+    console.error("Messaging not supported:", err);
     return null;
   }
-})();
-
-export const fetchToken = async (setTokenFound, setFcmToken) => {
-  return getToken(await messaging, {
-    vapidKey:
-      "BJrZj-2WNLPOSMWtCZa2FNVzDTfBqYVll2Sz8uQV0bzsOmg_brIdsIXGohYzevGtNrJ1Lclyv2hLWY2jBiATfr8",
-  })
-    .then((currentToken) => {
-      if (currentToken) {
-        setTokenFound(true);
-        setFcmToken(currentToken);
-
-        // Track the token -> client mapping, by sending to backend server
-        // show on the UI that permission is secured
-      } else {
-        setTokenFound(false);
-        setFcmToken();
-        // shows on the UI that permission is required
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      // catch error while creating client token
-    });
 };
 
+// fetchToken function
+export const fetchToken = async (setTokenFound, setFcmToken) => {
+  try {
+    const messaging = await getMessagingObject();
+    if (!messaging) return;
+
+    const currentToken = await getToken(messaging, {
+      vapidKey:
+        "",
+    });
+
+    if (currentToken) {
+      setTokenFound(true);
+      setFcmToken(currentToken);
+    } else {
+      setTokenFound(false);
+      setFcmToken();
+    }
+  } catch (err) {
+    console.error("Token fetch error:", err);
+  }
+};
+
+// onMessageListener function
 export const onMessageListener = async () =>
-  new Promise((resolve) =>
-    (async () => {
-      const messagingResolve = await messaging;
-      onMessage(messagingResolve, (payload) => {
+  new Promise(async (resolve, reject) => {
+    try {
+      const messaging = await getMessagingObject();
+      if (!messaging) return;
+
+      onMessage(messaging, (payload) => {
         resolve(payload);
       });
-    })()
-  );
-export const auth = getAuth(firebaseApp);
+    } catch (err) {
+      reject(err);
+    }
+  });

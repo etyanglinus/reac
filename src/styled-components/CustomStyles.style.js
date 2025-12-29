@@ -340,10 +340,12 @@ export const CustomImageContainerStyled = styled(Box)(
 		cursor,
 		aspect_ratio,
 		padding,
+		bg,
+		 borderBottomRightRadius
 	}) => ({
 		//maxWidth:'20rem',
 		display: "inline-flex",
-		background: "transparent",
+		backgroundColor: bg || "transparent",
 		width: width ? width : "100%",
 		height: height ? height : "100%",
 		minWidth: minwidth,
@@ -351,8 +353,8 @@ export const CustomImageContainerStyled = styled(Box)(
 		padding: padding ? padding : "",
 		marginBottom: margin_bottom,
 		position: "relative",
-		borderRadius: border_radius ? border_radius : "none",
-		//cursor: "pointer",
+		borderRadius: border_radius || "none",
+		borderBottomRightRadius:borderBottomRightRadius ? borderBottomRightRadius : "none",
 		[theme.breakpoints.down("md")]: {
 			height: mdHeight ? mdHeight : "",
 		},
@@ -367,6 +369,7 @@ export const CustomImageContainerStyled = styled(Box)(
 			width: "100%",
 			height: "100%",
 			objectFit: objectfit ? objectfit : "cover",
+			objectPosition: "50% 50%",
 			borderRadius: border_radius,
 			aspectRatio: aspect_ratio ? aspect_ratio : "",
 		},
@@ -425,6 +428,7 @@ export const SliderCustom = styled(Stack)(
 			},
 			"& .slick-list": {
 				paddingY: nopadding !== "true" && "8px",
+				//transform: "translate3d(0px, 0px, 0px) !important",
 				//paddingBottom: "1rem !important",
 				"& .slick-track": {
 					float: float
@@ -433,6 +437,7 @@ export const SliderCustom = styled(Stack)(
 						? "left"
 						: "right",
 					gap: "5px",
+					
 					//paddingBottom: paddingBottom && "1rem !important",
 				},
 			},

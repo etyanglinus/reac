@@ -43,14 +43,16 @@ import { useGetOrderCancelReason } from "api-manage/hooks/react-query/order/useG
 import { getToken } from "helper-functions/getToken";
 
 const getAddOnsNames = (addOns) => {
-  const names = addOns?.map(
+  if (!addOns || addOns.length === 0) return "";
+
+  const names = addOns.map(
     (item, index) =>
-      `${addOns[0]?.name}(${addOns[0]?.quantity})${
-        index !== addOns?.length - 1 ? "," : ""
-      }`
+      `${item.name}(${item.quantity})${index !== addOns.length - 1 ? "," : ""}`
   );
-  return names;
+
+  return names.join(" ");
 };
+
 
 const OrderSummery = (props) => {
   const {
@@ -116,7 +118,7 @@ const OrderSummery = (props) => {
             <Grid item xs={12} sm={12} md={12}>
               {!data?.prescription_order &&
                 trackOrderData?.module_type === "pharmacy" &&
-                trackOrderData?.order_attachment_full_url && (
+                trackOrderData?.order_attachment_full_url && trackOrderData?.attachment && (
                   <SingleOrderAttachment
                     title="Prescription"
                     trackOrderData={trackOrderData}
@@ -175,7 +177,7 @@ const OrderSummery = (props) => {
                             <Stack flexDirection={"row"} gap={"4px"}>
                               {t(product?.item_details?.name)}
                               {product?.item_details?.halal_tag_status &&
-                              product?.item_details?.is_halal ? (
+                                product?.item_details?.is_halal ? (
                                 <FoodHalalHaram
                                   position="relative"
                                   width={23}
@@ -303,29 +305,29 @@ const OrderSummery = (props) => {
                     </Stack>
                     {(trackOrderData?.payment_method === "offline_payment" ||
                       partialWithOffline) && (
-                      <Stack alignItems="flex-end" gap="5px">
-                        <Typography
-                          component="span"
-                          fontSize="12px"
-                          sx={{
-                            textTransform: "capitalize",
-                            padding: "4px",
-                            marginLeft: "15px",
-                            borderRadius: "3px",
-                            backgroundColor: buttonBackgroundColor(),
-                            color: theme.palette.whiteContainer.main,
-                            fontWeight: "600",
-                          }}
-                        >
-                          {/* {trackData?.order_status.replace("_", " ")} */}
-                          {trackOrderData?.offline_payment?.data?.status}
-                        </Typography>
-                        <ExpandMoreIcon
-                          onClick={handleClickOffline}
-                          sx={{ cursor: "pointer" }}
-                        />
-                      </Stack>
-                    )}
+                        <Stack alignItems="flex-end" gap="5px">
+                          <Typography
+                            component="span"
+                            fontSize="12px"
+                            sx={{
+                              textTransform: "capitalize",
+                              padding: "4px",
+                              marginLeft: "15px",
+                              borderRadius: "3px",
+                              backgroundColor: buttonBackgroundColor(),
+                              color: theme.palette.whiteContainer.main,
+                              fontWeight: "600",
+                            }}
+                          >
+                            {/* {trackData?.order_status.replace("_", " ")} */}
+                            {trackOrderData?.offline_payment?.data?.status}
+                          </Typography>
+                          <ExpandMoreIcon
+                            onClick={handleClickOffline}
+                            sx={{ cursor: "pointer" }}
+                          />
+                        </Stack>
+                      )}
                   </Stack>
                   {openOfflineDetails &&
                     (trackOrderData?.payment_method === "offline_payment" ||
@@ -337,8 +339,8 @@ const OrderSummery = (props) => {
                     )}
                   {trackOrderData?.offline_payment?.data?.status ===
                     "denied" && (
-                    <OfflineOrderDenied trackOrderData={trackOrderData} />
-                  )}
+                      <OfflineOrderDenied trackOrderData={trackOrderData} />
+                    )}
                   {openOfflineModal && (
                     <CustomModal
                       openModal={openOfflineModal}
@@ -453,13 +455,14 @@ const OrderSummery = (props) => {
               {trackOrderData?.order_status === "canceled" && (
                 <InstructionBox
                   title="cancellation note"
-                  note={trackOrderData?.cancellation_reason}
+                  note={trackOrderData?.cancellation_note}
                 />
               )}
             </Grid>
           </Grid>
 
           <Grid item xs={12} md={4} pl={{ xs: "0px", sm: "15px", md: "20px" }}>
+
             {data?.prescription_order ? (
               <PrescriptionOrderCalculation
                 data={data}
@@ -511,15 +514,6 @@ const OrderSummery = (props) => {
           </Grid>
         </Grid>
       )}
-      {/*<ModuleModal*/}
-      {/*  open={state.openModal}*/}
-      {/*  handleModalClose={handleClose}*/}
-      {/*  configData={configData}*/}
-      {/*  productDetailsData={item}*/}
-      {/*  addToWishlistHandler={addToWishlistHandler}*/}
-      {/*  removeFromWishlistHandler={removeFromWishlistHandler}*/}
-      {/*  isWishlisted={isWishlisted}*/}
-      {/*/>*/}
       <CustomModal
         openModal={openAdmin}
         handleClose={() => setOpenAdmin(false)}

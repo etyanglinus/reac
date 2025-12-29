@@ -48,7 +48,6 @@ import ModalExtendShrink from "./ModalExtendShrink";
 import { getCurrentModuleType } from "helper-functions/getCurrentModuleType";
 import { useGetWishList } from "api-manage/hooks/react-query/rental-wishlist/useGetWishlist";
 
-
 const MapModal = ({
   open,
   handleClose,
@@ -62,6 +61,7 @@ const MapModal = ({
 }) => {
   const router = useRouter();
   const theme = useTheme();
+
   const isXSmall = useMediaQuery(theme.breakpoints.down("sm"));
   const { configData } = useSelector((state) => state.configData);
   const { t } = useTranslation();
@@ -94,7 +94,6 @@ const MapModal = ({
     enabled
   );
   const dispatch = useDispatch();
-  
   const { coords, isGeolocationAvailable, isGeolocationEnabled, getPosition } =
     useGeolocated({
       positionOptions: {
@@ -106,7 +105,11 @@ const MapModal = ({
 
   useEffect(() => {
     if (places) {
-      setPredictions(places?.predictions);
+      const tempData = places?.suggestions?.map((item) => ({
+        place_id: item?.placePrediction?.placeId,
+        description: `${item?.placePrediction?.structuredFormat?.mainText?.text}, ${item?.placePrediction?.structuredFormat?.secondaryText?.text}`,
+      }));
+      setPredictions(tempData);
     }
   }, [places]);
   const { data: geoCodeResults, refetch: refetchCurrentLocation } =
@@ -150,9 +153,13 @@ const MapModal = ({
     successHandler
   );
   //
+
   useEffect(() => {
     if (placeDetails) {
-      setLocation(placeDetails?.result?.geometry?.location);
+      setLocation({
+        lat: placeDetails?.location?.latitude,
+        lng: placeDetails?.location?.longitude,
+      });
     }
   }, [placeDetails]);
   useEffect(() => {
@@ -177,7 +184,6 @@ const MapModal = ({
     setLocation(values);
   };
 
-
   // get module from localstorage
   const moduleType = getCurrentModuleType();
   const onSuccessHandler = (response) => {
@@ -185,9 +191,7 @@ const MapModal = ({
   };
   const { refetch: wishlistRefetch } = useWishListGet(onSuccessHandler);
   const { refetch: rentalWishlistRefetch } = useGetWishList(onSuccessHandler);
-
   const handlePickLocationOnClick = () => {
-    
     if (zoneId && geoCodeResults && location) {
       if (getToken()) {
         if (moduleType === "rental") {
@@ -196,10 +200,10 @@ const MapModal = ({
           wishlistRefetch();
         }
       }
-      if (fromReceiver !== "1") {
+      if (fromReceiver !== "1" && toparcel !== "1") {
         localStorage.setItem("zoneid", zoneId);
       }
-      if (fromReceiver !== "1") {
+      if (fromReceiver !== "1" && toparcel !== "1") {
         localStorage.setItem(
           "location",
           geoCodeResults?.results[0]?.formatted_address
@@ -214,17 +218,17 @@ const MapModal = ({
         handleClose();
       } else {
         if (fromStore) {
+          window.location.reload();
+          handleClose();
+        } else if (location && selectedModule) {
+          window.location.reload();
           handleClose();
         } else {
-          
           setOpenModuleSelection(true);
         }
       }
-      
     }
   };
-
-
 
   const handleCloseModuleModal = (item) => {
     if (item) {
@@ -299,7 +303,7 @@ const MapModal = ({
                       if (value) {
                         if (value !== "" && typeof value === "string") {
                           setLoadingAuto(true);
-                          const value = places?.predictions?.[0];
+                          const value = predictions[0];
                           handleLocationSelection(value);
                         } else {
                           handleLocationSelection(value);
@@ -410,7 +414,15 @@ const MapModal = ({
                   />
                 </WrapperCurrentLocationPick>
               </CustomBoxFullWidth>
-              <CustomStackFullWidth justifyCenter="center" alignItems="center">
+              <CustomStackFullWidth
+                justifyCenter="center"
+                alignItems="center"
+                sx={{
+                  position: "sticky",
+                  bottom: 0,
+                  zIndex: 9,
+                }}
+              >
                 {errorLocation?.response?.data ? (
                   <Button
                     aria-label="picklocation"

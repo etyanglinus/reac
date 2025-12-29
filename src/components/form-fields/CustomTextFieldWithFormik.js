@@ -26,6 +26,8 @@ const CustomTextFieldWithFormik = (props) => {
 		fontSize,
 		maxLength,
 		backgroundColor,
+		labelColor,
+		id
 	} = props;
 	const theme = useTheme();
 	const [inputValue, setInputValue] = useState(value);
@@ -42,6 +44,8 @@ const CustomTextFieldWithFormik = (props) => {
 			return (
 				<CustomTextFieldContainer>
 					<CustomTextFieldStyle
+					// Removed inputProps={{ id: id }} as it does not work here
+					labelColor={labelColor}
 						height={height}
 						backgroundColor={backgroundColor}
 						disabled={disabled}
@@ -58,8 +62,14 @@ const CustomTextFieldWithFormik = (props) => {
 						onChange={onChangeHandlerForField}
 						onBlur={onBlurHandler}
 						type={showPassword ? "text" : type}
-						kout
+
+					sx={{
+						"& .MuiFormLabel-asterisk": {
+							color: "red",
+						},
+					}}
 						InputProps={{
+							inputProps: { min: 0, id: id }, // <-- add id to input
 							style: {
 								height: "45px",
 							},
@@ -107,6 +117,8 @@ const CustomTextFieldWithFormik = (props) => {
 			return (
 				<CustomTextFieldContainer>
 					<CustomTextFieldStyle
+						id={id}
+						labelColor={labelColor}
 						backgroundColor={backgroundColor}
 						fontSize={fontSize}
 						disabled={disabled}
@@ -127,13 +139,18 @@ const CustomTextFieldWithFormik = (props) => {
 						height={height}
 						InputProps={{
 							startAdornment: startIcon,
-							inputProps: { min: 0 },
+							inputProps: { min: 0, id: id },
 							style: {
 								height: height || "45px",
 							},
 						}}
 						InputLabelProps={{
 							shrink: true,
+						}}
+						sx={{
+							"& .MuiFormLabel-asterisk": {
+								color: "red",
+							},
 						}}
 						{...fieldProps}
 					/>

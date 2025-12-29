@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import {Grid, useMediaQuery} from "@mui/material";
 import useGetNewArrivalStores from "api-manage/hooks/react-query/store/useGetNewArrivalStores";
 import { useGetVisitAgain } from "api-manage/hooks/react-query/useGetVisitAgain";
 import PaidAds from "components/home/paid-ads";
@@ -7,7 +7,6 @@ import { getToken } from "helper-functions/getToken";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import useGetOtherBanners from "../../../api-manage/hooks/react-query/useGetOtherBanners";
-import { IsSmallScreen } from "utils/CommonValues";
 import CustomContainer from "../../container";
 import OrderDetailsModal from "../../order-details-modal/OrderDetailsModal";
 import PromotionalBanner from "../PromotionalBanner";
@@ -24,6 +23,7 @@ import Stores from "../stores";
 import VisitAgain from "../visit-again";
 import PharmacyStaticBanners from "./pharmacy/pharmacy-banners/PharmacyStaticBanners";
 import TopOffersNearMe from "../top-offers-nearme";
+import RecommendedStore from "components/home/recommended-store";
 
 const menus = ["All", "Beauty", "Bread & Juice", "Drinks", "Milks"];
 const Grocery = (props) => {
@@ -39,29 +39,16 @@ const Grocery = (props) => {
     data: visitedStores,
     refetch: refetchVisitAgain,
     isFetching: visitIsFetching,
+    isLoading:visitIsLoading
   } = useGetVisitAgain();
   const {
     data: newStore,
     refetch: newStoreRefetch,
     isFetching,
+    isLoading:newStoreIsLoading
   } = useGetNewArrivalStores({
     type: "all",
   });
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await refetch();
-        if (token) {
-          await refetchVisitAgain();
-        }
-        newStoreRefetch();
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, [token]);
   useEffect(() => {
     if (visitedStores?.length > 0 || newStore?.stores?.length > 0) {
       if (visitedStores?.length > 0 && visitedStores) {
@@ -75,6 +62,8 @@ const Grocery = (props) => {
     }
   }, [visitedStores, newStore?.stores, getModuleId()]);
 
+    const isSmallScreen = useMediaQuery('(max-width:600px)');
+
   return (
     <Grid container spacing={1}>
       <Grid item xs={12} sx={{ marginTop: { xs: "-10px", sm: "10px" } }}>
@@ -82,24 +71,33 @@ const Grocery = (props) => {
           <FeaturedCategories configData={configData} />
         </CustomContainer>
       </Grid>
-      <Grid item xs={12} mb={3} sx={{ display: token ? "" : "none" }}>
-        {IsSmallScreen() ? (
-          <VisitAgain
-            configData={configData}
-            isVisited={isVisited}
-            visitedStores={storeData}
-          />
-        ) : (
-          <CustomContainer>
-            <VisitAgain
-              configData={configData}
-              isVisited={isVisited}
-              visitedStores={storeData}
-              isFetching={isFetching || visitIsFetching}
-            />
-          </CustomContainer>
-        )}
+      <Grid item xs={12}>
+        <CustomContainer>
+          <RecommendedStore/>
+        </CustomContainer>
       </Grid>
+        {token && (<Grid item xs={12} mb={3}>
+            {isSmallScreen ? (
+                <VisitAgain
+                    configData={configData}
+                    isVisited={isVisited}
+                    visitedStores={storeData}
+                    isLoading={visitIsLoading || newStoreIsLoading}
+                    
+
+                />
+            ) : (
+                <CustomContainer>
+                    <VisitAgain
+                        configData={configData}
+                        isVisited={isVisited}
+                        visitedStores={storeData}
+                        isFetching={isFetching || visitIsFetching}
+                         isLoading={visitIsLoading || newStoreIsLoading}
+                    />
+                </CustomContainer>
+            )}
+        </Grid>)}
       <Grid item xs={12} mb={3}>
         <CustomContainer>
           <PaidAds />
@@ -155,7 +153,7 @@ const Grocery = (props) => {
         </CustomContainer>
       </Grid>
       <Grid item xs={12} mb={2}>
-        {IsSmallScreen() ? (
+        {isSmallScreen ? (
           <Coupons />
         ) : (
           <CustomContainer>

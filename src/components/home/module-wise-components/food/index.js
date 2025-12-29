@@ -6,8 +6,8 @@ import { getModuleId } from "helper-functions/getModuleId";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import useGetOtherBanners from "../../../../api-manage/hooks/react-query/useGetOtherBanners";
-import { getToken } from "../../../../helper-functions/getToken";
-import { IsSmallScreen } from "../../../../utils/CommonValues";
+import { getToken } from "helper-functions/getToken";
+import { IsSmallScreen } from "utils/CommonValues";
 import CustomContainer from "../../../container";
 import OrderDetailsModal from "../../../order-details-modal/OrderDetailsModal";
 import Banners from "../../banners";
@@ -21,6 +21,7 @@ import Stores from "../../stores";
 import VisitAgain from "../../visit-again";
 import FeaturedCategoriesWithFilter from "../ecommerce/FeaturedCategoriesWithFilter";
 import TopOffersNearMe from "components/home/top-offers-nearme";
+import RecommendedStore from "components/home/recommended-store";
 
 const FoodModule = (props) => {
   const { configData } = props;
@@ -70,10 +71,15 @@ const FoodModule = (props) => {
   }, [visitedStores, newStore?.stores, getModuleId()]);
 
   return (
-    <Grid container spacing={1}>
+    <Grid container gap={1}>
       <Grid item xs={12} sx={{ marginTop: { xs: "-10px", sm: "10px" } }}>
         <CustomContainer>
           <FeaturedCategories configData={configData} />
+        </CustomContainer>
+      </Grid>
+      <Grid item xs={12}>
+        <CustomContainer>
+          <RecommendedStore/>
         </CustomContainer>
       </Grid>
       <Grid item xs={12}>

@@ -21,7 +21,7 @@ import H2 from "../../typographies/H2";
 import { HomeComponentsWrapper } from "../HomePageComponents";
 import { loveItemSettings } from "../love-item/loveItemSettings";
 import Menus from "./Menus";
-import { NextFood, PrevFood } from "./SliderSettings";
+import { createEnhancedArrows } from "../../common/EnhancedSliderArrows";
 
 const BestReviewedItems = (props) => {
   const { title, info, bannerIsLoading } = props;
@@ -30,9 +30,9 @@ const BestReviewedItems = (props) => {
   const [selectedMenuIndex, setSelectedMenuIndex] = useState(0);
   const [filteredData, setFilteredData] = useState([]);
   const [reRender, setReRender] = useState(false);
+  const [isSliderHovered, setIsSliderHovered] = useState(false);
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("md"));
-  const isMedium = useMediaQuery(theme.breakpoints.down("lg"));
   const SliderRef = useRef(null);
   const {
     data,
@@ -115,6 +115,11 @@ const BestReviewedItems = (props) => {
     slidesToShow: info?.best_reviewed_section_banner ? 4 : 5,
     slidesToScroll: 2,
     cssEase: "linear",
+    ...createEnhancedArrows(isSliderHovered, { 
+      displayNoneOnMobile: true,
+      variant: "primary",
+      noBackground: true
+    }),
     responsive: [
       {
         breakpoint: 350,
@@ -161,8 +166,6 @@ const BestReviewedItems = (props) => {
         },
       },
     ],
-    prevArrow: <PrevFood displayNoneOnMobile />,
-    nextArrow: <NextFood displayNoneOnMobile />,
   };
 
   const foodBestReviewedSliderSettings = {
@@ -174,6 +177,11 @@ const BestReviewedItems = (props) => {
     slidesToShow: info?.best_reviewed_section_banner ? 2.1 : 2.7,
     slidesToScroll: 1,
     cssEase: "linear",
+    ...createEnhancedArrows(isSliderHovered, { 
+      displayNoneOnMobile: true,
+      variant: "primary",
+      noBackground: true
+    }),
     responsive: [
       {
         breakpoint: 300,
@@ -239,8 +247,6 @@ const BestReviewedItems = (props) => {
         },
       },
     ],
-    prevArrow: <PrevFood displayNoneOnMobile />,
-    nextArrow: <NextFood displayNoneOnMobile />,
   };
 
   return (
@@ -308,7 +314,12 @@ const BestReviewedItems = (props) => {
                       sm={12}
                       lg={info?.best_reviewed_section_banner ? 9.5 : 12}
                     >
-                      <SliderCustom nopadding="false" paddingBottom="1rem">
+                      <SliderCustom 
+                        nopadding="false" 
+                        paddingBottom="1rem"
+                        onMouseEnter={() => setIsSliderHovered(true)}
+                        onMouseLeave={() => setIsSliderHovered(false)}
+                      >
                         <Stack>
                           <Slider {...foodBestReviewedSliderSettings}>
                             {bestReviewedItems?.products?.map((item, index) => {
@@ -341,7 +352,7 @@ const BestReviewedItems = (props) => {
 
               <SliderCustom nopadding="true">
                 <Slider {...loveItemSettings}>
-                  {[...Array(5)].map((index) => {
+                  {[...Array(5)].map((_, index) => {
                     return <ProductCardSimmer key={index} />;
                   })}
                 </Slider>
@@ -422,7 +433,10 @@ const BestReviewedItems = (props) => {
                           justifyContent="right"
                           key={reRender}
                         >
-                          <SliderCustom>
+                          <SliderCustom
+                            onMouseEnter={() => setIsSliderHovered(true)}
+                            onMouseLeave={() => setIsSliderHovered(false)}
+                          >
                             <Slider
                               ref={SliderRef}
                               {...bestReviewedSliderSettings}

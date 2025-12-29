@@ -88,7 +88,11 @@ const AddNewAddress = (props) => {
   );
   useEffect(() => {
     if (places) {
-      dispatch({ type: ACTIONS.setPredictions, payload: places?.predictions });
+      const tempData = places?.data?.suggestions?.map((item) => ({  
+        place_id: item?.placePrediction?.placeId,
+        description: `${item?.placePrediction?.structuredFormat?.mainText?.text}, ${item?.placePrediction?.structuredFormat?.secondaryText?.text}`,
+      }));
+      dispatch({ type: ACTIONS.setPredictions, payload: tempData });
     }
   }, [places]);
   const { data: geoCodeResults, isFetching: isFetchingGeoCode } = useGetGeoCode(
@@ -107,7 +111,7 @@ const AddNewAddress = (props) => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       if (zoneData) {
-        localStorage.setItem("zoneid", zoneData?.zone_id);
+        //localStorage.setItem("zoneid", zoneData?.zone_id);
       }
     }
   }, [zoneData]);
@@ -119,9 +123,13 @@ const AddNewAddress = (props) => {
   //
   useEffect(() => {
     if (placeDetails) {
+      const locObj = {
+        lat: placeDetails?.data?.location?.latitude,
+        lng: placeDetails?.data?.location?.longitude,
+      };
       dispatch({
         type: ACTIONS.setLocation,
-        payload: placeDetails?.result?.geometry?.location,
+        payload: locObj,
       });
     }
   }, [placeDetails]);
@@ -216,7 +224,7 @@ const AddNewAddress = (props) => {
                 onClick={getCurrentLocation}
                 sx={{
                   position: "absolute",
-                  bottom: "10%",
+                  bottom: "30%",
                   right: "10px",
                   borderRadius: "50%",
                   color: (theme) => theme.palette.primary.main,

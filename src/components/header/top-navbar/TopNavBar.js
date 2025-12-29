@@ -1,4 +1,4 @@
-import { Box, NoSsr, Stack, useMediaQuery, useTheme } from "@mui/material";
+import { Box, NoSsr, Stack, useMediaQuery } from "@mui/material";
 import React, { useState } from "react";
 import { CustomStackForLoaction } from "../NavBar.style";
 import ThemeSwitches from "./ThemeSwitches";
@@ -16,13 +16,11 @@ const TopNavBar = () => {
 		(state) => state.configData
 	);
 	const [openDrawer, setOpenDrawer] = useState(false);
-	const theme = useTheme();
 	let location = undefined;
 	if (typeof window !== "undefined") {
 		location = localStorage.getItem("location");
 	}
 	const isSmall = useMediaQuery("(max-width:1180px)");
-
 	return (
 		<>
 			<NoSsr>
@@ -30,7 +28,6 @@ const TopNavBar = () => {
 					sx={{
 						width: "100%",
 						background: (theme) => theme.palette.neutral[100],
-						// animation: `fadeIn 0.3s ease-in-out`,
 					}}
 				>
 					{!isSmall && (
@@ -64,11 +61,13 @@ const TopNavBar = () => {
 										alignItems="center"
 									>
 										<ThemeSwitches />
-										<CallToAdmin configData={configData} />
+										{configData?.phone && (<CallToAdmin configData={configData} />)}
+
 										<CustomLanguage
 											countryCode={countryCode}
 											language={language}
 										/>
+
 									</Stack>
 								</Stack>
 							</Box>
@@ -88,7 +87,7 @@ const TopNavBar = () => {
 								>
 									<Stack
 										alignItems="center"
-										justifyContent="center"
+										justifyContent="flex-start"
 									>
 										<LogoSide
 											width="126px"

@@ -19,7 +19,7 @@ import { useFormik } from "formik";
 import { getGuestId } from "helper-functions/getToken";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCartList } from "redux/slices/cart";
 import { setUser } from "redux/slices/profileInfo";
 import { setWishList } from "redux/slices/wishList";
@@ -57,6 +57,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { getCurrentModuleType } from "helper-functions/getCurrentModuleType";
 import useGetBookingList from "api-manage/hooks/react-query/useGetBookingList";
 import { useGetWishList } from "api-manage/hooks/react-query/rental-wishlist/useGetWishlist";
+import ForgotPassword from "../ForgotPassword/ForgotPassword";
+import { setOpenForgotPasswordModal } from "redux/slices/utils";
 
 const SignIn = ({
   modalFor,
@@ -76,6 +78,7 @@ const SignIn = ({
 }) => {
   const router = useRouter();
   const previousRouteName = router.query.from;
+  const { openForgotPasswordModal } = useSelector((state) => state.utilsData);
   const guestId = getGuestId();
   const dispatch = useDispatch();
   const [openModuleSelection, setOpenModuleSelection] = useState(false);
@@ -336,15 +339,19 @@ const SignIn = ({
   };
 
   const rememberMeHandleChange = (e) => {
-    if (e.target.checked) {
-      setIsRemember(true);
-    } else {
-      localStorage.removeItem("userDatafor");
-    }
-  };
-
+    setIsRemember(e.target.checked)
+  }
   useEffect(() => {
-    const { centralize_login } = configData || {};
+    let userDatafor = undefined
+    if (typeof window !== 'undefined') {
+      userDatafor = JSON.parse(localStorage.getItem('userDatafor'))
+    }
+    if(userDatafor){
+      setIsRemember(true)
+    }
+  }, [])
+  const { centralize_login } = configData || {};
+  const getActiveLoginType = () => {
 
     if (centralize_login) {
       const { otp_login_status, manual_login_status, social_login_status } =
@@ -359,6 +366,11 @@ const SignIn = ({
         },
       });
     }
+  }
+const onlyOtp=centralize_login?.otp_login_status && !centralize_login?.manual_login_status && !centralize_login?.social_login_status
+
+  useEffect(() => {
+    getActiveLoginType()
   }, []);
 
   useEffect(() => {
@@ -372,7 +384,7 @@ const SignIn = ({
     validationSchema: Yup.object({
       phone: Yup.string()
         .required(t("Please give a phone number"))
-        .min(10, "number must be 10 digits"),
+        .min(10, "Number must be 10 digits"),
     }),
     onSubmit: async (values, helpers) => {
       try {
@@ -407,124 +419,108 @@ const SignIn = ({
     }
   }, [modalFor]);
 
-  const handleFormBasedOnDirection = () => {
-    switch (state.status) {
-      case "otp":
-        return (
-          <OtpLogin
-            otpHandleChange={otpHandleChange}
-            otpLoginFormik={otpLoginFormik}
-            configData={configData}
-            isLoading={loginIsLoading}
-            handleClick={handleClick}
-            rememberMeHandleChange={rememberMeHandleChange}
-            handleClose={handleClose}
-          />
-        );
-      case "manual":
-        return (
-          <Stack width="100%">
-            <SignInForm
-              isApiCalling={isApiCalling}
-              configData={configData}
-              handleOnChange={handleOnChange}
-              passwordHandler={passwordHandler}
-              loginFormik={loginFormik}
-              lanDirection={lanDirection?.direction}
-              rememberMeHandleChange={rememberMeHandleChange}
-              isLoading={loginIsLoading}
-              only
-              handleSignUp={handleSignUp}
-              handleClick={handleClick}
-            />
-          </Stack>
-        );
-      case "social":
-        return (
-          <SocialLogins
-            socialLogin={configData?.social_login}
-            configData={configData}
-            state={state}
-            setJwtToken={setJwtToken}
-            setUserInfo={setUserInfo}
-            handleSuccess={handleSuccess}
-            setModalFor={setModalFor}
-            setMedium={setMedium}
-            loginMutation={loginMutation}
-            setLoginInfo={setLoginInfo}
-          />
-        );
-      case "otp_manual":
-        return (
-          <Stack width="100%" gap="1rem">
-            <SignInForm
-              isApiCalling={isApiCalling}
-              configData={configData}
-              handleOnChange={handleOnChange}
-              passwordHandler={passwordHandler}
-              loginFormik={loginFormik}
-              lanDirection={lanDirection?.direction}
-              rememberMeHandleChange={rememberMeHandleChange}
-              isLoading={loginIsLoading}
-              handleClick={handleClick}
-            />
 
-            <Typography
-              textAlign="center"
-              fontSize="14px"
-              color={theme.palette.neutral[400]}
-            >
-              {t("Or")}
-            </Typography>
-            <Typography
-              component="span"
-              textAlign="center"
-              fontSize="14px"
-              fontWeight="400"
-              color={theme.palette.neutral[400]}
-            >
-              {t("Sign in with")}
-              <Typography
-                onClick={selectedOtp}
-                sx={{ textDecoration: "underline", cursor: "pointer" }}
-                component="span"
-                color={theme.palette.primary.main}
-                ml="10px"
-              >
-                {t("OTP")}
-              </Typography>
-            </Typography>
-            <CustomStackFullWidth
-              alignItems="center"
-              spacing={0.5}
-              sx={{ paddingTop: "10px !important" }}
-            >
-              <CustomStackFullWidth
-                direction="row"
-                alignItems="center"
-                justifyContent="center"
-                spacing={0.5}
-              >
-                <CustomTypography fontSize="14px">
-                  {t("Don't have an account?")}
-                </CustomTypography>
-                <span
-                  onClick={handleSignUp}
-                  style={{
-                    color: theme.palette.primary.main,
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                  }}
-                >
-                  {t("Sign Up")}
-                </span>
-              </CustomStackFullWidth>
-            </CustomStackFullWidth>
-          </Stack>
-        );
-      case "otp_social":
-        return (
-          <>
+  const handleFormBasedOnDirection = () => {
+    const commonSignInFormProps = {
+      isApiCalling,
+      configData,
+      handleOnChange,
+      passwordHandler,
+      loginFormik,
+      lanDirection: lanDirection?.direction,
+      rememberMeHandleChange,
+      isLoading: loginIsLoading,
+      handleClick,
+      handleClose,
+      isRemember,
+    };
+
+    const commonSocialLoginsProps = {
+      socialLogin: configData?.social_login,
+      configData,
+      state,
+      setJwtToken,
+      setUserInfo,
+      handleSuccess,
+      setModalFor,
+      setMedium,
+      loginMutation,
+      setLoginInfo,
+    };
+
+    const orSeparator = (
+      <Typography
+        textAlign="center"
+        fontSize="14px"
+        color={theme.palette.neutral[400]}
+      >
+        {t("Or")}
+      </Typography>
+    );
+
+    const otpOption = (
+      <Typography
+        component="span"
+        textAlign="center"
+        fontSize="14px"
+        fontWeight="400"
+        color={theme.palette.neutral[400]}
+      >
+        {t("Sign in with")}
+        <Typography
+          onClick={selectedOtp}
+          sx={{ textDecoration: "underline", cursor: "pointer" }}
+          component="span"
+          color={theme.palette.primary.main}
+          ml="10px"
+        >
+          {t("OTP")}
+        </Typography>
+      </Typography>
+    );
+
+    const signUpFooter = (
+      <CustomStackFullWidth
+        alignItems="center"
+        spacing={0.5}
+        sx={{ paddingTop: "10px !important" }}
+      >
+        <CustomStackFullWidth
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          spacing={0.5}
+        >
+          <CustomTypography fontSize="14px">
+            {t("Don't have an account?")}
+          </CustomTypography>
+          <span
+            onClick={handleSignUp}
+            style={{
+              color: theme.palette.primary.main,
+              textDecoration: "underline",
+              cursor: "pointer",
+            }}
+          >
+          {t("Sign Up")}
+        </span>
+        </CustomStackFullWidth>
+      </CustomStackFullWidth>
+    );
+
+    const socialLoginSection = (
+      <>
+        <Typography fontSize="14px" textAlign="center">
+          {t("or login with")}
+        </Typography>
+        <SocialLogins {...commonSocialLoginsProps} />
+      </>
+    );
+
+    if(state?.status && state?.activeLoginType){
+      switch (state.status) {
+        case "otp":
+          return (
             <OtpLogin
               otpHandleChange={otpHandleChange}
               otpLoginFormik={otpLoginFormik}
@@ -532,169 +528,77 @@ const SignIn = ({
               isLoading={loginIsLoading}
               handleClick={handleClick}
               rememberMeHandleChange={rememberMeHandleChange}
+              handleClose={handleClose}
+              isRemember={isRemember}
+              getActiveLoginType={getActiveLoginType}
+              onlyOtp={onlyOtp}
             />
+          );
 
-            <Typography fontSize="14px" textAlign="center">
-              {" "}
-              {"or login with"}
-            </Typography>
-            <SocialLogins
-              socialLogin={configData?.social_login}
-              configData={configData}
-              state={state}
-              setJwtToken={setJwtToken}
-              setUserInfo={setUserInfo}
-              handleSuccess={handleSuccess}
-              setModalFor={setModalFor}
-              setMedium={setMedium}
-              loginMutation={loginMutation}
-              setLoginInfo={setLoginInfo}
-            />
-          </>
-        );
-      case "manual_social":
-        return (
-          <CustomStackFullWidth gap="1rem">
-            <SignInForm
-              isApiCalling={isApiCalling}
-              configData={configData}
-              handleOnChange={handleOnChange}
-              passwordHandler={passwordHandler}
-              loginFormik={loginFormik}
-              lanDirection={lanDirection?.direction}
-              rememberMeHandleChange={rememberMeHandleChange}
-              isLoading={loginIsLoading}
-              handleClick={handleClick}
-            />
-
-            <Typography fontSize="14px" textAlign="center">
-              {" "}
-              {"or login with"}
-            </Typography>
-            <SocialLogins
-              socialLogin={configData?.social_login}
-              configData={configData}
-              state={state}
-              setJwtToken={setJwtToken}
-              setUserInfo={setUserInfo}
-              handleSuccess={handleSuccess}
-              setModalFor={setModalFor}
-              setMedium={setMedium}
-              loginMutation={loginMutation}
-              setLoginInfo={setLoginInfo}
-            />
-
-            <CustomStackFullWidth
-              alignItems="center"
-              spacing={0.5}
-              sx={{ paddingTop: "10px !important" }}
-            >
-              <CustomStackFullWidth
-                direction="row"
-                alignItems="center"
-                justifyContent="center"
-                spacing={0.5}
-              >
-                <CustomTypography fontSize="14px">
-                  {t("Don't have an account?")}
-                </CustomTypography>
-                <span
-                  onClick={handleSignUp}
-                  style={{
-                    color: theme.palette.primary.main,
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                  }}
-                >
-                  {t("Sign Up")}
-                </span>
-              </CustomStackFullWidth>
-            </CustomStackFullWidth>
-          </CustomStackFullWidth>
-        );
-      case "all":
-        return (
-          <CustomStackFullWidth gap="1rem">
-            <SignInForm
-              isApiCalling={isApiCalling}
-              configData={configData}
-              handleOnChange={handleOnChange}
-              passwordHandler={passwordHandler}
-              loginFormik={loginFormik}
-              lanDirection={lanDirection?.direction}
-              rememberMeHandleChange={rememberMeHandleChange}
-              isLoading={loginIsLoading}
-              handleClick={handleClick}
-            />
-            <Stack gap="10px">
-              <Typography
-                textAlign="center"
-                fontSize="14px"
-                color={theme.palette.neutral[400]}
-              >
-                {t("Or")}
-              </Typography>
-              <Typography
-                component="span"
-                textAlign="center"
-                fontSize="14px"
-                fontWeight="400"
-                color={theme.palette.neutral[400]}
-              >
-                {t("Sign in with")}
-                <Typography
-                  onClick={selectedOtp}
-                  sx={{ textDecoration: "underline", cursor: "pointer" }}
-                  component="span"
-                  color={theme.palette.primary.main}
-                  ml="10px"
-                >
-                  {t("OTP")}
-                </Typography>
-              </Typography>
+        case "manual":
+          return (
+            <Stack width="100%">
+              <SignInForm {...commonSignInFormProps} only handleSignUp={handleSignUp} />
+              
             </Stack>
-            <SocialLogins
-              socialLogin={configData?.social_login}
-              configData={configData}
-              state={state}
-              setJwtToken={setJwtToken}
-              setUserInfo={setUserInfo}
-              handleSuccess={handleSuccess}
-              setModalFor={setModalFor}
-              setMedium={setMedium}
-              loginMutation={loginMutation}
-              setLoginInfo={setLoginInfo}
-            />
-            <CustomStackFullWidth
-              alignItems="center"
-              spacing={0.5}
-              sx={{ paddingTop: "10px !important" }}
-            >
-              <CustomStackFullWidth
-                direction="row"
-                alignItems="center"
-                justifyContent="center"
-                spacing={0.5}
-              >
-                <CustomTypography fontSize="14px">
-                  {t("Don't have an account?")}
-                </CustomTypography>
-                <span
-                  onClick={handleSignUp}
-                  style={{
-                    color: theme.palette.primary.main,
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                  }}
-                >
-                  {t("Sign Up")}
-                </span>
-              </CustomStackFullWidth>
+          );
+
+        case "social":
+          return <SocialLogins {...commonSocialLoginsProps} />;
+
+        case "otp_manual":
+          return (
+            <Stack width="100%" gap="1rem">
+              <SignInForm {...commonSignInFormProps} />
+              {orSeparator}
+              {otpOption}
+              {signUpFooter}
+            </Stack>
+          );
+
+        case "otp_social":
+          return (
+            <>
+              <OtpLogin
+                otpHandleChange={otpHandleChange}
+                otpLoginFormik={otpLoginFormik}
+                configData={configData}
+                isLoading={loginIsLoading}
+                handleClick={handleClick}
+                rememberMeHandleChange={rememberMeHandleChange}
+                isRemember={isRemember}
+                getActiveLoginType={getActiveLoginType}
+                onlyOtp={onlyOtp}
+              />
+              {socialLoginSection}
+            </>
+          );
+
+        case "manual_social":
+          return (
+            <CustomStackFullWidth gap="1rem">
+              <SignInForm {...commonSignInFormProps} />
+              {socialLoginSection}
+              {signUpFooter}
             </CustomStackFullWidth>
-          </CustomStackFullWidth>
-        );
-      default:
-        return null; // Fallback if no conditions are met
+          );
+
+        case "all":
+          return (
+            <CustomStackFullWidth gap="1rem">
+              <SignInForm {...commonSignInFormProps} />
+              <Stack gap="10px">
+                {orSeparator}
+                {otpOption}
+              </Stack>
+              <SocialLogins {...commonSocialLoginsProps} />
+              {signUpFooter}
+            </CustomStackFullWidth>
+          );
+
+        default:
+          return null;
+      }
     }
   };
   return (
@@ -764,6 +668,7 @@ const SignIn = ({
           handleClose={() => setOpenOtpModal(false)}
         />
       </CustomModal>
+      
     </>
   );
 };

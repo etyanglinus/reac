@@ -8,7 +8,6 @@ import { CustomButtonPrimary } from "styled-components/CustomButtons.style";
 import { CustomButtonStack } from "components/checkout/CheckOut.style";
 
 const ParcelInfo = ({ parcelCategories }) => {
-
   return (
     <CustomStackFullWidth>
       <Card sx={{ padding: "1.2rem " }}>

@@ -12,7 +12,6 @@ const getPopularStore = async (type) => {
 };
 const getPopularStoreInfiniteScroll = async (pageParams) => {
   const { type, limit, offset, pageParam } = pageParams;
-
   const { data } = await MainApi.get(
     `${getCurrentModuleType() === "rental"?popular_provider:popular_store_api}?type=${type}&offset=${pageParam}&limit=${limit}`
   );

@@ -23,7 +23,7 @@ export const wishListSlice = createSlice({
       state.wishLists.vehicles.push(action.payload);
     },
     addWishListStore: (state, action) => {
-      state.wishLists.providers.push(action.payload);
+      state.wishLists.store.push(action.payload);
     },
     addWishListProvider: (state, action) => {
       state.wishLists.providers.push(action.payload);

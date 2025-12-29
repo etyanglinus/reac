@@ -6,7 +6,7 @@ import {
   store_registration,
 } from "../../../ApiRoutes";
 import MainApi from "../../../MainApi";
-
+import dayjs from "dayjs";
 const postData = async (storeData) => {
   const translationsR = [];
   for (const [locale, name] of Object.entries(storeData.restaurant_name)) {
@@ -19,9 +19,8 @@ const postData = async (storeData) => {
     translationsR.push({ id: null, locale, key: "address", value: address });
   }
   const translations = JSON.stringify(translationsR);
-  const finalData = {
+  let finalData = {
     translations,
-    tax: storeData.vat,
     minimum_delivery_time: storeData?.min_delivery_time,
     maximum_delivery_time: storeData?.max_delivery_time,
     latitude: storeData?.lng,
@@ -34,12 +33,28 @@ const postData = async (storeData) => {
     zone_id: storeData?.zoneId,
     module_id: storeData?.module_id,
     delivery_time_type: "minute",
-    business_plan: storeData?.value.business_plan,
-    package_id: storeData?.value.package_id,
+    business_plan: storeData?.value?.business_plan,
+    package_id: storeData?.value?.package_id,
     logo: storeData?.logo,
     cover_photo: storeData?.cover_photo,
-    pickup_zone_id: JSON.stringify(storeData?.pickup_zone_id?.map(String)),
+    pickup_zone_id: storeData?.pickup_zone_id
+      ? JSON.stringify(storeData?.pickup_zone_id?.map(String))
+      : [],
   };
+
+// ✅ Conditionally add TIN-related fields only if they exist
+  if (storeData?.tin || storeData?.tin_expire_date || storeData?.tin_certificate_image) {
+    finalData = {
+      ...finalData,
+      ...(storeData?.tin && { tin: storeData.tin }),
+      ...(storeData?.tin_expire_date && {
+        tin_expire_date: dayjs(storeData.tin_expire_date).format("YYYY-MM-DD"),
+      }),
+      ...(storeData?.tin_certificate_image && {
+        tin_certificate_image: storeData.tin_certificate_image,
+      }),
+    };
+  }
   const formData = new FormData();
   const appendFormData = (formData, data, parentKey = "") => {
     Object.keys(data).forEach((key) => {

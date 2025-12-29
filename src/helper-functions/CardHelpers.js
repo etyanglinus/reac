@@ -57,7 +57,6 @@ export const getDiscountedAmount = (
       mainPrice = price - (discount / 100) * price;
     }
   }
-  
   return mainPrice;
 };
 export const getSelectedAddOn = (add_ons) => {
@@ -90,7 +89,6 @@ export const getSelectedAddOn = (add_ons) => {
 //   } else {
 //     if (discountType === "amount" || discountType === "fixed") {
 //       mainPrice = storeDiscount;
-//       console.log({ mainPrice });
 //     } else if (discountType === "percent") {
 //       mainPrice = price * (storeDiscount / 100);
 //     }

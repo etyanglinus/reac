@@ -35,7 +35,7 @@ const InterestOptions = ({ configData }) => {
   };
   let searchKey = "";
   let queryKey = "";
-  const { data: categories, isFetching,isLoading:rentalLoading } = useGetCategoryVehicleLists();
+  const { data: categories, isFetching, isLoading: rentalLoading } = useGetCategoryVehicleLists();
   const { refetch } = useGetCategories(searchKey, onSuccessHandler, queryKey);
 
   useEffect(() => {
@@ -47,7 +47,6 @@ const InterestOptions = ({ configData }) => {
       setCategoryList(categories?.vehicles);
     }
   }, [categories]);
-
   const handleItemClick = (item) => {
     //state manipulation with select deselect
     const isItemAlreadyExist = selectedId.find((id) => id === item.id);
@@ -73,7 +72,7 @@ const InterestOptions = ({ configData }) => {
           toast.success(response?.message);
           dispatch(setInterestId(selectedId));
           dispatch(setExistingModuleIds(categoryList[0]?.module_id));
-          Router.push("/home", undefined, { shallow: true });
+          Router.back();
         },
         onError: (error) => {
           toast.error(error?.response?.data?.message);

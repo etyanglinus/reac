@@ -4,7 +4,7 @@ import { getCurrentModuleType } from "helper-functions/getCurrentModuleType";
 import { ModuleTypes } from "helper-functions/moduleTypes";
 import { CustomBoxFullWidth } from "styled-components/CustomStyles.style";
 import CustomImageContainer from "../../CustomImageContainer";
-import banner from "../assets/banner.png";
+import banner from "../assets/banner.webp";
 import rcommerceSearchBg from "../assets/ecommerce_top_bg.png";
 import foodBanner from "../assets/food.png";
 import pharmacy from "../assets/par.png";
@@ -13,10 +13,11 @@ import { BannerCityIcon } from "components/home/module-wise-components/rental/Re
 import LeftCar from "/public/static/rental/left_car.png";
 import RightCar from "/public/static/rental/right_car.png";
 import { useEffect, useState } from "react";
+import Image from 'next/image'
+
 
 const TopBanner = () => {
   const [moduleType, setModuleType] = useState(null);
-
   const theme = useTheme();
   // Ensure moduleType is set on the client
   useEffect(() => {
@@ -66,6 +67,7 @@ const TopBanner = () => {
         minHeight: {
           xs: moduleType === "parcel" ? "250px" : "160px",
           sm: "270px",
+          md:"270px"
         },
         backgroundColor: getBGColor(),
         position: "relative",
@@ -110,14 +112,8 @@ const TopBanner = () => {
           />
         </Box>
       ) : (
-        <Box sx={{ position: "absolute", height: "100%", width: "100%" }}>
-          <CustomImageContainer
-            src={getBGImage()}
-            alt="banner"
-            height="100%"
-            width="100%"
-            obejctfit="cover"
-          />
+        <Box sx={{ position: "absolute", height: "100%", width: "100%", "img": { objectFit: "cover", width: "100%", height: "100%" } }}>
+          <Image width={1917} height={270} src={getBGImage()} alt="banner" priority={true} />
         </Box>
       )}
     </CustomBoxFullWidth>

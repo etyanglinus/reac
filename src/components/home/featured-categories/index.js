@@ -41,21 +41,12 @@ export const ButtonRight = styled(CustomButtonPrimary)(({ theme }) => ({
   },
 }));
 
-const FeaturedCategories = ({ configData }) => {
+const FeaturedCategories = () => {
+  const dispatch = useDispatch();
   const { featuredCategories } = useSelector((state) => state.storedData);
   const slider = useRef(null);
-  const { data, refetch, isFetched, isFetching, isLoading, isRefetching } =
-    useGetFeaturedCategories();
-  const dispatch = useDispatch();
-  useEffect(() => {
-    refetch();
-  }, []);
-
-  useEffect(() => {
-    if (data) {
-      dispatch(setFeaturedCategories(data?.data));
-    }
-  }, [data]);
+  const { data, isFetched, refetch, isLoading } = useGetFeaturedCategories();
+  const [isSliderHovered, setIsSliderHovered] = React.useState(false);
 
   const moduleWiseCard = () => {
     switch (getCurrentModuleType()) {
@@ -64,19 +55,21 @@ const FeaturedCategories = ({ configData }) => {
           <CustomBoxFullWidth
             sx={{
               "& .slick-slider": {
-                paddingTop: {
-                  xs: "22px",
-                  md: "30px",
-                },
-                paddingBottom: {
-                  xs: "4px",
-                  md: "30px",
-                },
+                // paddingTop: {
+                //   xs: "22px",
+                //   md: "30px",
+                // },
+                // paddingBottom: {
+                //   xs: "4px",
+                //   md: "30px",
+                // },
               },
             }}
+            onMouseEnter={() => setIsSliderHovered(true)}
+            onMouseLeave={() => setIsSliderHovered(false)}
           >
             <Slider {...settings} ref={slider}>
-              {[...featuredCategories].reverse().map((item, index) => {
+              {[...data?.data].reverse().map((item, index) => {
                 return (
                   <FeaturedItemCard
                     key={index}
@@ -92,88 +85,125 @@ const FeaturedCategories = ({ configData }) => {
         );
       case ModuleTypes.PHARMACY:
         return (
-          <Slider {...settings} ref={slider}>
-            {[...featuredCategories].reverse()?.map((item, index) => {
-              return (
-                <PharmacyCategoryCard
-                  key={index}
-                  image={item?.image_full_url}
-                  title={item?.name}
-                  slug={item?.slug}
-                  id={item?.id}
-                />
-              );
-            })}
-          </Slider>
+          <div
+            onMouseEnter={() => setIsSliderHovered(true)}
+            onMouseLeave={() => setIsSliderHovered(false)}
+          >
+            <Slider {...settings} ref={slider}>
+              {[...data?.data].reverse()?.map((item, index) => {
+                return (
+                  <PharmacyCategoryCard
+                    key={index}
+                    image={item?.image_full_url}
+                    title={item?.name}
+                    slug={item?.slug}
+                    id={item?.id}
+                  />
+                );
+              })}
+            </Slider>
+          </div>
         );
       case ModuleTypes.ECOMMERCE:
         return (
-          <Slider {...shopCategorySliderSettings} ref={slider}>
-            {featuredCategories?.map((item, index) => {
-              return (
-                <ShopCategoryCard
-                  key={index}
-                  imageUrl={item?.image_full_url}
-                  item={item}
-                />
-              );
-            })}
-          </Slider>
+          <div
+            onMouseEnter={() => setIsSliderHovered(true)}
+            onMouseLeave={() => setIsSliderHovered(false)}
+          >
+            <Slider {...shopCategorySliderSettings} ref={slider}>
+              {data?.data?.map((item, index) => {
+                return (
+                  <ShopCategoryCard
+                    key={index}
+                    imageUrl={item?.image_full_url}
+                    item={item}
+                  />
+                );
+              })}
+            </Slider>
+          </div>
         );
       case ModuleTypes.FOOD:
         return (
-          <Slider {...foodCategorySliderSettings} ref={slider}>
-            {featuredCategories?.map((item, index) => {
-              return (
-                <FoodCategoryCard
-                  key={item?.id}
-                  id={item?.id}
-                  categoryImage={item?.image}
-                  name={item?.name}
-                  slug={item?.slug}
-                  categoryImageUrl={item?.image_full_url}
-                  height="40px"
-                />
-              );
-            })}
-          </Slider>
+          <div
+            onMouseEnter={() => setIsSliderHovered(true)}
+            onMouseLeave={() => setIsSliderHovered(false)}
+          >
+            <Slider {...foodCategorySliderSettings} ref={slider}>
+              {data?.data?.map((item, index) => {
+                return (
+                  <FoodCategoryCard
+                    key={item?.id}
+                    id={item?.id}
+                    categoryImage={item?.image}
+                    name={item?.name}
+                    slug={item?.slug}
+                    categoryImageUrl={item?.image_full_url}
+                    height="40px"
+                  />
+                );
+              })}
+            </Slider>
+          </div>
         );
     }
   };
+
   const moduleWiseCardShimmer = () => {
     switch (getCurrentModuleType()) {
       case ModuleTypes.GROCERY:
         return (
-          <Slider {...settings} ref={slider}>
-            {[...Array(8)]?.map((item, index) => {
-              return <FeaturedItemCard key={index} onlyshimmer />;
-            })}
-          </Slider>
+          <CustomBoxFullWidth
+            onMouseEnter={() => setIsSliderHovered(true)}
+            onMouseLeave={() => setIsSliderHovered(false)}
+
+          >
+            <Slider {...settings} ref={slider}>
+              {[...Array(10)]?.map((item, index) => {
+                return <FeaturedItemCard key={index} onlyshimmer />;
+              })}
+            </Slider>
+          </CustomBoxFullWidth>
         );
 
       case ModuleTypes.PHARMACY:
         return (
-          <Slider {...settings} ref={slider}>
-            {[...Array(8)]?.map((item, index) => {
-              return <PharmacyCategoryCard key={index} onlyshimmer />;
-            })}
-          </Slider>
+          <div
+            onMouseEnter={() => setIsSliderHovered(true)}
+            onMouseLeave={() => setIsSliderHovered(false)}
+          >
+            <Slider {...settings} ref={slider}>
+              {[...Array(10)]?.map((_, index) => {
+                return <PharmacyCategoryCard key={index} onlyshimmer />;
+              })}
+            </Slider>
+          </div>
         );
       case ModuleTypes.ECOMMERCE:
         return (
-          <Slider {...shopCategorySliderSettings} ref={slider}>
-            {[...Array(5)]?.map((item, index) => {
-              return <ShopCategoryCard key={index} onlyshimmer />;
-            })}
-          </Slider>
+          <div
+            onMouseEnter={() => setIsSliderHovered(true)}
+            onMouseLeave={() => setIsSliderHovered(false)}
+          >
+            <Slider {...shopCategorySliderSettings} ref={slider}>
+              {[...Array(6)]?.map((_, index) => {
+                return <ShopCategoryCard key={index} onlyshimmer />;
+              })}
+            </Slider>
+          </div>
         );
       case ModuleTypes.FOOD:
         return (
-          <Slider {...foodCategorySliderSettings} ref={slider}>
-            {[...Array(15)]?.map((item, index) => {
-              return <FoodCategoryCard key={index} onlyshimmer />;
-            })}
-          </Slider>
+          <div
+            onMouseEnter={() => setIsSliderHovered(true)}
+            onMouseLeave={() => setIsSliderHovered(false)}
+          >
+            <Slider {...foodCategorySliderSettings} ref={slider}>
+              {[...Array(8)]?.map((item, index) => {
+                return <FoodCategoryCard key={index} onlyshimmer />;
+              })}
+            </Slider>
+          </div>
         );
     }
   };
@@ -184,8 +214,8 @@ const FeaturedCategories = ({ configData }) => {
     speed: 500,
     slidesToShow: 5,
     slidesToScroll: 1,
-    nextArrow: moduleWiseNext(),
-    prevArrow: moduleWisePrev(),
+    nextArrow: moduleWiseNext(isSliderHovered),
+    prevArrow: moduleWisePrev(isSliderHovered),
 
     responsive: [
       {
@@ -322,8 +352,8 @@ const FeaturedCategories = ({ configData }) => {
     speed: 500,
     slidesToShow: 8.5,
 
-    nextArrow: moduleWiseNext(),
-    prevArrow: moduleWisePrev(),
+    nextArrow: moduleWiseNext(isSliderHovered),
+    prevArrow: moduleWisePrev(isSliderHovered),
     currentSlide: 0,
     rtl: true,
 
@@ -422,8 +452,8 @@ const FeaturedCategories = ({ configData }) => {
     slidesToShow: 7,
     slidesToScroll: 3,
     // autoplay: true,
-    nextArrow: moduleWiseNext(),
-    prevArrow: moduleWisePrev(),
+    nextArrow: moduleWiseNext(isSliderHovered),
+    prevArrow: moduleWisePrev(isSliderHovered),
     responsive: [
       {
         breakpoint: 1450,
@@ -480,17 +510,32 @@ const FeaturedCategories = ({ configData }) => {
 
   return (
     <CustomBoxFullWidth sx={{ mt: "20px" }}>
-      {isFetching ? (
+      {isLoading ? (
         <HomeComponentsWrapper>
-          <SliderCustom nopadding="true" sx={{ paddingTop: "15px" }}>
+          <SliderCustom
+            sx={{
+              "& .slick-slider": {
+                "& .slick-slide": {
+                  padding: { xs: "0px", md: "6px" },
+                  paddingBottom: {
+                    xs: "5px",
+                    sm: "10px",
+                    md: "20px !important",
+                  },
+                },
+              },
+            }}
+            onMouseEnter={() => setIsSliderHovered(true)}
+            onMouseLeave={() => setIsSliderHovered(false)}
+          >
             {moduleWiseCardShimmer()}
           </SliderCustom>
         </HomeComponentsWrapper>
       ) : (
-        featuredCategories &&
-        featuredCategories.length > 0 && (
+        data?.data &&
+        data?.data.length > 0 && (
           <HomeComponentsWrapper>
-            {featuredCategories && featuredCategories.length > 0 && (
+            {data?.data && data?.data.length > 0 && (
               <SliderCustom
                 sx={{
                   "& .slick-slider": {
@@ -504,8 +549,11 @@ const FeaturedCategories = ({ configData }) => {
                     },
                   },
                 }}
+                onMouseEnter={() => setIsSliderHovered(true)}
+                onMouseLeave={() => setIsSliderHovered(false)}
               >
                 {moduleWiseCard()}
+                {/*{moduleWiseCardShimmer()}*/}
               </SliderCustom>
             )}
           </HomeComponentsWrapper>

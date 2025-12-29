@@ -25,9 +25,9 @@ const getAddOnsPrice = (items) => {
     (total, product) =>
       (product?.add_ons?.length > 0
         ? product?.add_ons?.reduce(
-            (cTotal, cProduct) => cProduct?.price * cProduct?.quantity + cTotal,
-            0
-          )
+          (cTotal, cProduct) => cProduct?.price * cProduct?.quantity + cTotal,
+          0
+        )
         : 0) + total,
     0
   );
@@ -53,6 +53,20 @@ const OrderCalculation = ({ data, t, trackOrderData }) => {
     trackOrderData?.order_amount - trackOrderData?.partially_paid_amount;
   return (
     <OrderSummaryCalculationCard spacing={1.5}>
+      {trackOrderData?.bring_change_amount > 0 ? (
+        <CustomStackFullWidth
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          spacing={2}
+          backgroundColor="primary.light"
+          padding="10px 15px"
+          borderRadius="8px"
+        >
+          <Typography fontSize="14px">{t(`Please bring ${getAmountWithSign(trackOrderData?.bring_change_amount)} in change when making the delivery.`)}</Typography>
+        </CustomStackFullWidth>
+      ) : null}
+
       <Typography fontWeight="500">{t("Summary")}</Typography>
       <CustomStackFullWidth
         direction="row"
@@ -104,12 +118,12 @@ const OrderCalculation = ({ data, t, trackOrderData }) => {
         <Typography fontSize="14px">
           -
           {trackOrderData &&
-          getAmountWithSign(trackOrderData?.store_discount_amount)
+            getAmountWithSign(trackOrderData?.store_discount_amount)
             ? getAmountWithSign(
-                trackOrderData?.store_discount_amount +
-                  trackOrderData?.flash_admin_discount_amount +
-                  trackOrderData?.flash_store_discount_amount
-              )
+              trackOrderData?.store_discount_amount +
+              trackOrderData?.flash_admin_discount_amount +
+              trackOrderData?.flash_store_discount_amount
+            )
             : 0}
         </Typography>
       </CustomStackFullWidth>
@@ -157,25 +171,24 @@ const OrderCalculation = ({ data, t, trackOrderData }) => {
           </Typography>
         </CustomStackFullWidth>
       ) : null}
-      {configData?.tax_included === 0 && (
-        <CustomStackFullWidth
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          spacing={2}
-        >
-          <Typography fontSize="14px">
-            {" "}
-            {t("VAT")}({getRestaurantValue(data, "tax")}
-            %)
-          </Typography>
-          <Typography fontSize="14px">
-            {trackOrderData &&
-              getAmountWithSign(trackOrderData?.total_tax_amount)}
-          </Typography>
-        </CustomStackFullWidth>
-      )}
-
+      {trackOrderData?.tax_status === "excluded" && trackOrderData?.total_tax_amount
+        > 0 && (
+          <CustomStackFullWidth
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={2}
+          >
+            <Typography>
+              {t("VAT/TAX")}
+            </Typography>
+            <Typography>
+              {trackOrderData?.tax_status !== "included" && " (+) "}
+              {trackOrderData &&
+                getAmountWithSign(trackOrderData?.total_tax_amount)}
+            </Typography>
+          </CustomStackFullWidth>
+        )}
       {Number.parseInt(trackOrderData?.dm_tips) !== 0 && (
         <CustomStackFullWidth
           direction="row"
@@ -196,7 +209,11 @@ const OrderCalculation = ({ data, t, trackOrderData }) => {
           justifyContent="space-between"
           spacing={2}
         >
-          <Typography fontSize="14px">
+          <Typography fontSize="14px" sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap", // ensures single line
+          }}>
             {configData?.additional_charge_name}
           </Typography>
           <Typography fontSize="14px">
@@ -229,15 +246,19 @@ const OrderCalculation = ({ data, t, trackOrderData }) => {
         justifyContent="space-between"
         spacing={2}
       >
-        <Typography fontWeight="bold" color="primary.main">
+        <Typography component="span" fontWeight="bold" color="primary.main">
           {t("Total")}
+          {trackOrderData?.tax_status === "included" && (<Typography component="span" ml={"3px"} fontSize="12px" fontWeight="normal" color="text.secondary">
+            {t("(Vat/Tax incl.)")}
+          </Typography>)}
+
         </Typography>
         <Typography fontWeight="bold">
           {getAmountWithSign(trackOrderData?.order_amount)}
         </Typography>
       </CustomStackFullWidth>
       {trackOrderData?.partially_paid_amount &&
-      trackOrderData?.order_status !== "canceled" ? (
+        trackOrderData?.order_status !== "canceled" ? (
         <CustomStackFullWidth
           direction="row"
           alignItems="center"
@@ -307,25 +328,6 @@ const OrderCalculation = ({ data, t, trackOrderData }) => {
           )}
         </>
       ) : null}
-      {/*{trackOrderData?.partially_paid_amount ? (*/}
-      {/*  <CustomStackFullWidth*/}
-      {/*    direction="row"*/}
-      {/*    alignItems="center"*/}
-      {/*    justifyContent="space-between"*/}
-      {/*    spacing={2}*/}
-      {/*  >*/}
-      {/*    <Typography*/}
-      {/*      fontSize="14px"*/}
-      {/*      textTransform="capitalize"*/}
-      {/*      fontWeight="bold"*/}
-      {/*    >*/}
-      {/*      {t("due amount")}*/}
-      {/*    </Typography>*/}
-      {/*    <Typography fontSize="14px" fontWeight="bold">*/}
-      {/*      {trackOrderData && getAmountWithSign(due_amount)}*/}
-      {/*    </Typography>*/}
-      {/*  </CustomStackFullWidth>*/}
-      {/*) : null}*/}
     </OrderSummaryCalculationCard>
   );
 };

@@ -135,10 +135,7 @@ export const getItemDataForAddToCart = (
         : [],
     add_on_qtys:
       values?.add_ons?.length > 0
-        ? values?.addons?.map((add) => {
-            totalQty += add.quantity;
-            return totalQty;
-          })
+        ? values?.addons?.map((add) => add.quantity)
         : [],
     item_id: values?.id,
     price: mainPrice,

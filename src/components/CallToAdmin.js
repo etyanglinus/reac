@@ -1,16 +1,15 @@
 import { useTheme } from "@emotion/react";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import { Typography } from "@mui/material";
-import React from "react";
 import { TopBarButton } from "./header/NavBar.style";
 import ClickToCall from "./header/top-navbar/ClickToCall";
+import Link from "next/link";
 
-const CallToAdmin = (props) => {
-  const { configData } = props;
+const CallToAdmin = ({ configData }) => {
   const theme = useTheme();
 
   return (
-    <ClickToCall phone={configData?.phone}>
+    <Link href={`tel:${configData?.phone}`}>
       <TopBarButton
         size="small"
         variant="text"
@@ -35,7 +34,7 @@ const CallToAdmin = (props) => {
           {configData?.phone}
         </Typography>
       </TopBarButton>
-    </ClickToCall>
+    </Link>
   );
 };
 

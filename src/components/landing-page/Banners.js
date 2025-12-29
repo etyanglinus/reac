@@ -8,17 +8,18 @@ import {
 } from "styled-components/CustomStyles.style";
 import CustomImageContainer from "../CustomImageContainer";
 import CustomContainer from "../container";
+import NextImage from "components/NextImage";
 
-const Banners = ({ landingPageData, isSmall }) => {
+const Banners = ({ promotionalBanner, isSmall, feature }) => {
   const infiniteManage = () => {
     if (isSmall) {
-      if (landingPageData?.promotion_banners?.length === 1) {
+      if (promotionalBanner?.length === 1) {
         return false;
       } else {
         return true;
       }
     } else {
-      if (landingPageData?.promotion_banners?.length > 3) {
+      if (promotionalBanner?.length > 3) {
         return true;
       } else {
         return false;
@@ -30,9 +31,9 @@ const Banners = ({ landingPageData, isSmall }) => {
     if (isSmall) {
       return 1;
     } else {
-      if (landingPageData?.promotion_banners?.length > 2) {
-        return 3;
-      } else if (landingPageData?.promotion_banners?.length === 2) {
+      if (promotionalBanner?.length > 2) {
+        return 2;
+      } else if (promotionalBanner?.length === 2) {
         return 2;
       } else {
         return 1;
@@ -47,7 +48,7 @@ const Banners = ({ landingPageData, isSmall }) => {
         gap="20px"
       >
         {/* <Grid container spacing={2}> */}
-        {landingPageData?.promotion_banners_full_url?.map((item, index) => {
+        {promotionalBanner?.map((item, index) => {
           return (
             <Box
               key={index}
@@ -55,25 +56,26 @@ const Banners = ({ landingPageData, isSmall }) => {
                 border: (theme) =>
                   `0.828571px solid ${alpha(theme.palette.primary.main, 0.15)}`,
                 position: "relative",
-                height: "175px",
-                width: { sm: "100%", md: "395px" },
-                borderRadius: "5px",
+
+                width: { sm: "100%", md: "590px" },
+                borderRadius: "20px",
                 overflow: "hidden",
-                "&:hover": {
-                  img: {
-                    transform: "scale(1.1)",
-                    transition: "transform .8s ease-in-out",
-                  },
-                },
+                "img": {
+                  height: "auto",
+                  maxWidth: "100%",
+
+                  // border: "1px solid"
+                }
               }}
             >
-              <CustomImageContainer
+              <NextImage
                 src={item}
                 alt="banners"
-                height="100%"
-                width="100%"
-                objectfit="cover"
-                borderRadius="5px"
+                height={173}
+                width={590}
+                objectFit="cover"
+                borderRadius="20px"
+                aspectRatio="2/1"
               />
             </Box>
           );
@@ -87,13 +89,16 @@ const Banners = ({ landingPageData, isSmall }) => {
         sx={{
           "& .slick-slider": {
             "& .slick-slide": {
-              padding: { xs: "5px", md: "11px" },
+
+              "img": {
+                width: "100%",
+              }
             },
           },
         }}
       >
         <Slider {...settings}>
-          {landingPageData?.promotion_banners_full_url?.map((item, index) => {
+          {promotionalBanner?.map((item, index) => {
             return (
               <Box
                 key={index}
@@ -104,25 +109,29 @@ const Banners = ({ landingPageData, isSmall }) => {
                       0.15
                     )}`,
                   position: "relative",
-                  height: "175px",
+
                   width: "100%",
-                  borderRadius: "5px",
+                  borderRadius: "20px",
                   overflow: "hidden",
-                  "&:hover": {
-                    img: {
-                      transform: "scale(1.1)",
-                      transition: "transform 0.8s ease-in-out",
-                    },
-                  },
+                  aspectRatio: "3/1",
+                  "img": {
+                    height: "100%",
+                    maxWidth: "100%",
+                    width: "100%",
+
+
+                    // border: "1px solid"
+                  }
                 }}
               >
-                <CustomImageContainer
+                <NextImage
                   src={item}
                   alt="banners"
-                  height="100%"
-                  width="100%"
-                  objectfit="cover"
-                  borderRadius="5px"
+                  height={200}
+                  width={590}
+                  objectFit="cover"
+                  borderRadius="20px"
+
                 />
               </Box>
             );
@@ -176,19 +185,28 @@ const Banners = ({ landingPageData, isSmall }) => {
         <Box
           sx={{
             border: (theme) =>
-              `0.828571px solid ${alpha(theme.palette.primary.main, 0.15)}`,
+              `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
             position: "relative",
-            height: "175px",
+
             borderRadius: "5px",
+            width: "100%",
+            aspectRatio: "3/1",
+            "img": {
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              // border: "1px solid"
+            }
           }}
         >
-          <CustomImageContainer
-            src={landingPageData?.promotion_banners_full_url[0]}
+          <NextImage
+            src={promotionalBanner[0]?.img}
             alt="banners"
-            height="100%"
-            width="100%"
-            objectfit="cover"
+            height={175}
+            width={1250}
+            objectFit="cover"
             borderRadius="5px"
+
           />
         </Box>
       </Stack>
@@ -196,15 +214,15 @@ const Banners = ({ landingPageData, isSmall }) => {
   };
   const handleContent = () => {
     if (isSmall) {
-      if (landingPageData?.promotion_banners?.length === 1) {
+      if (promotionalBanner?.length === 1) {
         return <>{singleImageManage()}</>;
       } else {
         return <>{sliderManage()}</>;
       }
     } else {
-      if (landingPageData?.promotion_banners?.length === 1) {
+      if (promotionalBanner?.length === 1) {
         return <>{singleImageManage()}</>;
-      } else if (landingPageData?.promotion_banners?.length === 2) {
+      } else if (promotionalBanner?.length === 2) {
         return <>{twoItemManage()}</>;
       } else {
         return <>{sliderManage()}</>;

@@ -25,8 +25,6 @@ const CustomMultiSelect = ({
 	}, [selectedChips]);
 
 
-
-
 	return (
 		<Autocomplete
 			multiple
